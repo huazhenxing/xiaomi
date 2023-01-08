@@ -107,7 +107,6 @@ export default {
       method: "get",
       url: "hisearch/se_default",
     }).then((res) => {
-      console.log(res);
       this.discover_list = res ? res.data.data.discover_list : [];
     });
   },

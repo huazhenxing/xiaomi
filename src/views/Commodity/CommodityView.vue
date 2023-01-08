@@ -94,12 +94,9 @@
       </div>
 
       <!-- 商品介绍 -->
-      <div class="section">
+      <div class="section" v-if="product_info.product_desc_ext">
         <div class="product_info_product_desc">
-          <div
-            class="overview overview-goods-brief"
-            v-if="product_info.product_desc_ext"
-          >
+          <div class="overview overview-goods-brief">
             <div class="goods-brief fz-xs">
               {{ product_info.product_desc_ext }}
             </div>
@@ -136,7 +133,10 @@
       </div>
 
       <!-- 商品关键参数 -->
-      <div class="section">
+      <div
+        class="section"
+        v-if="goods_info[change_index].class_parameters.list"
+      >
         <div class="product_info_class_parameters">
           <div class="classic-param">
             <div
@@ -545,7 +545,7 @@
       </div>
 
       <!-- 用户评论 -->
-      <div class="section">
+      <div class="section" v-if="comments">
         <div class="product_info_comment">
           <div class="comments-gallery">
             <div class="comments-title">
@@ -617,7 +617,7 @@
       </div>
 
       <!-- 米粉点评团 -->
-      <div class="section">
+      <div class="section" v-if="topic">
         <div class="product_info_content">
           <div class="topic-header ui-flex align-center justify-space-between">
             <div class="topic-title">米粉点评团</div>
@@ -663,7 +663,10 @@
                 </div>
               </div>
             </div>
-            <div class="topic-more layout column align-center justify-center">
+            <div
+              v-if="topic.length > 2"
+              class="topic-more layout column align-center justify-center"
+            >
               查看更多
               <img
                 src="https://m.mi.com/static/img/icon-arrow-right.5d0f572caf.png"
@@ -675,7 +678,7 @@
       </div>
 
       <!-- 商品轮播图 -->
-      <div class="section">
+      <div class="section" v-if="swiper">
         <div class="product_info_comment">
           <div class="swiper-container swiper-ads swiper-container-horizontal">
             <van-swipe
@@ -755,7 +758,7 @@
       </div>
 
       <!-- 商品描述 -->
-      <div class="section">
+      <div class="section" v-if="description">
         <div class="description-view">
           <div class="tab-header border-bottom-1px">
             <!-- <span class="flex on">商品介绍</span> -->
@@ -781,7 +784,7 @@
       </div>
 
       <!-- 商品推荐 -->
-      <div class="section">
+      <div class="section" v-if="recommend_goods">
         <div class="product_info_recommend">
           <div class="recommend-box">
             <div class="recommend-title">商品推荐</div>
@@ -959,7 +962,6 @@ export default {
 
       //华振锋写的
       // let produceOption = res.data.data.buy_option;
-
       // for (var i = 0; i < produceOption.length; i++) {
       //   //如果有不同产品，添加不同产品的名称
       //   if (produceOption[i].name == "产品") {
@@ -1094,7 +1096,6 @@ export default {
         }
       }
       console.log(this.match_choose_arr);
-
 
       for (var i = 0; i < this.match_choose_arr.length; i++) {
         for (var k = 0; k < this.buy_option[1].list.length; k++) {
@@ -2325,6 +2326,7 @@ export default {
     background-color: #ff6700;
     width: 16.664rem;
     height: 2.078rem;
+    z-index: 0;
   }
 }
 

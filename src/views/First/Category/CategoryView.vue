@@ -13,10 +13,10 @@
         <div class="list-navbar">
           <ul class="list-ul">
             <li
-              v-for="(item, index) in nav_list"
+              v-for="item in nav_list"
               :key="item.category_id"
-              :class="{ active: index == activeKey }"
-              @click="onclick(item.category_id, index)"
+              :class="{ active: item.category_id == activeKey }"
+              @click="onclick(item.category_id)"
             >
               <span>{{ item.category_name }}</span>
             </li>
@@ -174,7 +174,8 @@ export default {
       nav_list: [], // 左边导航列表
       title_list: null, //标题
       category_list: null, //右边商品列表
-      activeKey: 0, //默认选中导航
+
+      activeKey: 1242, //默认选中导航
       empty_id: null,
     };
   },
@@ -182,7 +183,6 @@ export default {
     this.onclick(1242);
     this.axios.get("home/category_v2").then((res) => {
       this.nav_list = res.data.data;
-      // console.log("点击获取侧边导航_数据", this.nav_list);
     });
   },
   methods: {
@@ -192,8 +192,8 @@ export default {
     },
 
     //点击获取数据
-    onclick(category_id, index) {
-      this.activeKey = index;
+    onclick(category_id) {
+      this.activeKey = category_id;
       //防止重复点击
       if (this.empty_id !== category_id) {
         this.empty_id = category_id;

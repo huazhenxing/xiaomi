@@ -46,7 +46,7 @@
 
       <div class="app-nav">
         <div class="nav-main">
-          <div class="item active" @click="show = true">
+          <div class="item active" @click="show = !show">
             综合
             <i class="icon icon-down active"></i>
           </div>
@@ -68,7 +68,7 @@
               <em></em>
             </div>
             <div>
-              综合排序
+              新品优先
               <em></em>
             </div>
           </div>
@@ -201,7 +201,6 @@ export default {
     },
 
     onLoad() {
-      console.log(this.$route.query.key);
       this.page = this.list_v2.length / 20 + 1;
       setTimeout(() => {
         this.axios({
@@ -234,7 +233,7 @@ export default {
 
   mounted() {
     // 路由参数
-    console.log(this.$route.query.key);
+    // console.log(this.$route.query.key);
   },
 
   // 路由复用

@@ -5,7 +5,7 @@
       class="app-header-wrapper app-shell-header"
       style="background-color: rgb(242, 242, 242)"
     >
-      <div class="app-header-left">
+      <div class="app-header-left" @click="Returning">
         <div class="app-header-item">
           <i class="image-icons app-header-icon icon-back"></i>
         </div>
@@ -15,12 +15,13 @@
           {{ page_title }}
         </div>
       </div>
-      <div class="app-header-right">
+      <div class="app-header-right" @click="goJump('/search')">
         <div class="app-header-item">
           <i class="image-icons app-header-icon icon-search"></i>
         </div>
       </div>
     </header>
+
     <!-- 内容 -->
     <div class="app-view-wrapper">
       <div
@@ -38,10 +39,11 @@
               class="tab-item"
               v-for="item in top_tab"
               :key="item.category_id"
-              @click="ss"
+              @click="jumpCommodityListView(item.category_id)"
             >
               <img :src="item.img_url" alt="" />
               <div class="pro-name bold">{{ item.name }}</div>
+              <div :class="{ selected: item.category_id == first }"></div>
             </div>
           </div>
         </div>
@@ -51,6 +53,7 @@
             class="item ui-flex"
             v-for="item in product"
             :key="item.product_id"
+            @click="goJump(`/commodity/detail/${item.product_id}`)"
           >
             <div class="item-img">
               <img :src="item.puzzle_url" alt="" />
@@ -65,8 +68,9 @@
               <div class="item-intro-price flex">
                 <span class="price"><span>￥</span>{{ item.price }} </span>
                 <del v-if="item.price != item.market_price">
-                  <span class="price"
-                    ><span>￥</span>{{ item.market_price }}
+                  <span>
+                    <span>￥</span>
+                    <span class="price">{{ item.market_price }}</span>
                   </span>
                 </del>
               </div>
@@ -85,6 +89,7 @@
               class="recommend-item"
               v-for="(item, index) in recommend_list"
               :key="index"
+              @click="goJump(`/commodity/detail/${item.product_id}`)"
             >
               <div
                 class="exposure"
@@ -118,17 +123,28 @@
 </template>
 
 <script>
+/* 引入公共函数 */
+// import common from "../../../assets/js/common";
+// Vue.use(common);
+
 export default {
+  name: "CommodityListView",
+  components: {},
+  props: [],
   data() {
     return {
       top_tab: null, //导航数据
       product: null, //商品列表
       recommend_list: null, //推荐商品
       page_title: null, //标题
+      get_parameter: null,
+      first: null,
     };
   },
   created() {
-    // console.log("路由参数==>", this.$route.params.id);
+    //防止重复点击
+    this.first = this.$route.params.id;
+
     this.axios({
       method: "get",
       url: "product/all_product",
@@ -149,10 +165,64 @@ export default {
         cat_id: this.$route.params.id,
       },
     }).then((res) => {
-      console.log("推荐商品数据==>", res);
       this.recommend_list = res.data.data.recommend_list;
     });
+
+    this.$watch(
+      () => this.$route.params,
+      (toParams, previousParams) => {
+        // 对路由变化做出响应...
+        // console.log(toParams, previousParams);
+
+        //导航+商品列表数据
+        this.axios({
+          method: "get",
+          url: "product/all_product",
+          params: {
+            cat_id: toParams.id,
+          },
+        }).then((res) => {
+          this.page_title = res.data.data.page_title;
+          this.top_tab = res.data.data.top_tab;
+          this.product = res.data.data.product;
+        });
+        //商品推荐数据
+        this.axios({
+          method: "get",
+          url: "product/recommendv2",
+          params: {
+            cat_id: this.$route.params.id,
+          },
+        }).then((res) => {
+          this.recommend_list = res.data.data.recommend_list;
+        });
+      }
+    );
   },
+  mounted() {},
+  methods: {
+    //点击返回上一级
+    Returning() {
+      this.$router.go(-1);
+    },
+    //点击去到搜索页面
+    goJump(routing) {
+      this.$router.push(routing);
+    },
+    //点击切换选项卡
+    jumpCommodityListView(category_id) {
+      //修改路由参数
+      if (this.first != category_id) {
+        this.first = category_id;
+        this.$router.replace({
+          name: "CommodityListView",
+          params: { id: category_id },
+        });
+      }
+    },
+  },
+
+  watch: {},
 };
 </script>
 
@@ -246,6 +316,7 @@ export default {
   .head {
     width: 100%;
     overflow-x: auto;
+    // overflow:hidden;
     background: #fff;
     padding: 5.208rem 0 0 10.417rem;
     text-align: left;
@@ -253,6 +324,9 @@ export default {
     top: 50px;
     left: 0;
     z-index: 20;
+  }
+  .head::-webkit-scrollbar {
+    display: none;
   }
   .tab {
     text-align: left;
@@ -350,6 +424,12 @@ export default {
         del {
           margin-left: 7.813rem;
           font-size: 15.625rem;
+          color: #999;
+          font-size: 12rem;
+          .price {
+            color: #999;
+            display: inline;
+          }
         }
       }
       .item-intro-comment {
@@ -419,7 +499,8 @@ export default {
         .price {
           font-size: 12rem;
           margin-left: 5.208rem;
-          color: #666;
+          color: #999;
+          display: inline;
           text-decoration: line-through;
           margin-top: 1.125rem;
         }

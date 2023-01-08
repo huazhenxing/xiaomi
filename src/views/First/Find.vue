@@ -48,7 +48,7 @@
 
 <script>
 import Vue from "vue";
-import { CellGroup, Tabbar, TabbarItem } from "vant";
+import { Tabbar, TabbarItem } from "vant";
 
 Vue.use(Tabbar);
 Vue.use(TabbarItem);
