@@ -94,9 +94,12 @@
       </div>
 
       <!-- 商品介绍 -->
-      <div class="section" v-if="product_info.product_desc_ext">
+      <div class="section">
         <div class="product_info_product_desc">
-          <div class="overview overview-goods-brief">
+          <div
+            class="overview overview-goods-brief"
+            v-if="product_info.product_desc_ext"
+          >
             <div class="goods-brief fz-xs">
               {{ product_info.product_desc_ext }}
             </div>
@@ -133,10 +136,7 @@
       </div>
 
       <!-- 商品关键参数 -->
-      <div
-        class="section"
-        v-if="goods_info[change_index].class_parameters.list"
-      >
+      <div class="section">
         <div class="product_info_class_parameters">
           <div class="classic-param">
             <div
@@ -196,7 +196,7 @@
                         <div class="pro-name">
                           {{ goods_info[change_index].name }}
                         </div>
-                        <div>x {{ value }}</div>
+                        <div>x {{ goods_count }}</div>
                         <div class="right-icon"></div>
                       </div>
                     </div>
@@ -215,33 +215,33 @@
                     "
                   >
                     <div class="product-img">
-                      <img
-                        src="//cdn.cnbj1.fds.api.mi-img.com/mi-mall/55098d0d1d85c73c6bfc07e88fb9a3a3.png"
-                        alt=""
-                      />
+                      <img :src="goods_info[change_index].img_url" alt="" />
                     </div>
 
                     <div class="product-desc flex layout column justify-start">
                       <div class="product-price">
-                        <div class="cur-price">￥2499</div>
-                        <div class="origin-price">￥2799</div>
+                        <div class="cur-price">
+                          &yen; {{ goods_info[change_index].price }}
+                        </div>
+                        <div class="origin-price">
+                          &yen; {{ goods_info[change_index].market_price }}
+                        </div>
                       </div>
-                      <div class="name">Redmi K50 12GB+256GB 墨羽</div>
+                      <div class="name">
+                        {{ goods_info[change_index].name }}
+                      </div>
                     </div>
                   </div>
 
                   <div class="max5">
                     <div
                       class="mt2x"
-                      v-for="item in buy_option"
+                      v-for="(item, index) in buy_option"
                       :key="item.prop_cfg_id"
                       v-show="item.list"
                     >
                       <div class="option-title">
-                        {{ item.name
-                        }}<span style="display: none"
-                          >请选择： {{ item.name }}</span
-                        >
+                        {{ item.name }}
                       </div>
                       <div
                         class="
@@ -252,27 +252,34 @@
                           wrap
                         "
                       >
-                        <div
-                          class="
-                            option-item
-                            align-center
-                            justify-center
-                            ui-flex
-                          "
-                          v-for="item in item.list"
-                          :key="item.prop_value_id"
-                          @click="clickVersion(item.prop_value_id, item.list)"
-                          :class="{ on: item.prop_value_id == change_id }"
-                        >
-                          <!-- on -->
-                          <p>{{ item.name }}</p>
-                        </div>
+                        <template v-for="attr in item.list">
+                          <div
+                            class="
+                              option-item
+                              align-center
+                              justify-center
+                              ui-flex
+                            "
+                            :key="attr.prop_value_id"
+                            v-if="
+                              item.show_attr_list.includes(attr.prop_value_id)
+                            "
+                            @click="clickVersion(attr.prop_value_id, index)"
+                            :class="{
+                              on:
+                                attr.prop_value_id == selected_attr_list[index],
+                            }"
+                          >
+                            <!-- on -->
+                            <p>{{ attr.name }}</p>
+                          </div>
+                        </template>
                       </div>
                     </div>
 
                     <div class="layout align-center justify-space-between">
                       <div class="option-title tit-sub">购买数量</div>
-                      <van-stepper v-model="value" />
+                      <van-stepper v-model="goods_count" />
                     </div>
 
                     <div class="ywb">
@@ -545,7 +552,7 @@
       </div>
 
       <!-- 用户评论 -->
-      <div class="section" v-if="comments">
+      <div class="section">
         <div class="product_info_comment">
           <div class="comments-gallery">
             <div class="comments-title">
@@ -617,7 +624,7 @@
       </div>
 
       <!-- 米粉点评团 -->
-      <div class="section" v-if="topic">
+      <div class="section">
         <div class="product_info_content">
           <div class="topic-header ui-flex align-center justify-space-between">
             <div class="topic-title">米粉点评团</div>
@@ -663,10 +670,7 @@
                 </div>
               </div>
             </div>
-            <div
-              v-if="topic.length > 2"
-              class="topic-more layout column align-center justify-center"
-            >
+            <div class="topic-more layout column align-center justify-center">
               查看更多
               <img
                 src="https://m.mi.com/static/img/icon-arrow-right.5d0f572caf.png"
@@ -678,7 +682,7 @@
       </div>
 
       <!-- 商品轮播图 -->
-      <div class="section" v-if="swiper">
+      <div class="section">
         <div class="product_info_comment">
           <div class="swiper-container swiper-ads swiper-container-horizontal">
             <van-swipe
@@ -758,7 +762,7 @@
       </div>
 
       <!-- 商品描述 -->
-      <div class="section" v-if="description">
+      <div class="section">
         <div class="description-view">
           <div class="tab-header border-bottom-1px">
             <!-- <span class="flex on">商品介绍</span> -->
@@ -784,7 +788,7 @@
       </div>
 
       <!-- 商品推荐 -->
-      <div class="section" v-if="recommend_goods">
+      <div class="section">
         <div class="product_info_recommend">
           <div class="recommend-box">
             <div class="recommend-title">商品推荐</div>
@@ -895,16 +899,13 @@ export default {
       recommend_goods_arr: [], //推荐商品数组
       recommend_goods_index: 0, //推荐商品索引
 
-      choose: false, //点击选择产品
+      choose: true, //点击选择产品
       view: false, //点击查看服务说明
-      value: 1, //选中几件
-      buy_option: null, //商品购买选择
+      goods_count: 1, //选中几件
+      buy_option: null, //商品属性选项选择
+      selected_attr_list: [], // 选中属性列表
+      change_index: 0, //选中商品索引
 
-      change_index: 0, //变化的index
-      match_choose_arr: [],
-      buy_option_color: [],
-
-      change_id: null, //变化的id
       // produce_detail: [
       //   {
       //     name: "k40",
@@ -962,6 +963,7 @@ export default {
 
       //华振锋写的
       // let produceOption = res.data.data.buy_option;
+
       // for (var i = 0; i < produceOption.length; i++) {
       //   //如果有不同产品，添加不同产品的名称
       //   if (produceOption[i].name == "产品") {
@@ -979,8 +981,19 @@ export default {
       if (res.data.data == null) {
         return;
       }
-      this.data = res.data.data;
+
       this.goods_info = res.data.data.goods_info;
+      this.change_index = 0;
+      this.selected_attr_list = this.goods_info[
+        this.change_index
+      ].prop_list.map((item) => item.prop_value_id);
+      this.buy_option = res.data.data.buy_option;
+      this.buy_option.forEach((item) => {
+        item.show_attr_list = item.list.map((item) => item.prop_value_id);
+      });
+      this.attrShowIdx(0);
+
+      this.data = res.data.data;
       this.product_info = res.data.data.product_info;
       this.comments = res.data.data.goods_share_datas.comments;
       this.sections =
@@ -989,12 +1002,9 @@ export default {
       if (res.data.data.hot_parts) {
         this.hot_recommend = res.data.data.hot_parts.parts;
       }
-      this.buy_option = res.data.data.buy_option;
 
       // this.buy_option_version = this.buy_option[0].list;
       // console.log("version", this.buy_option_version);
-      // this.buy_option_color = this.buy_option[1].list;
-      // console.log("color", this.buy_option_color);
 
       //过滤数据
       for (var i = 0; i < this.sections.length; i++) {
@@ -1082,31 +1092,12 @@ export default {
       this.view = false;
     },
 
-    //点击选择版本
-    clickVersion(version) {
-      console.log(version);
-
-      this.change_id = version;
-      this.match_choose_arr = [];
-      this.buy_option_color = [];
-
-      for (var i = 0; i < this.goods_info.length; i++) {
-        if (version == this.goods_info[i].prop_list[0].prop_value_id) {
-          this.match_choose_arr.push(this.goods_info[i]);
-        }
-      }
-      console.log(this.match_choose_arr);
-
-      for (var i = 0; i < this.match_choose_arr.length; i++) {
-        for (var k = 0; k < this.buy_option[1].list.length; k++) {
-          if (
-            this.match_choose_arr[i].prop_list[1].prop_value_id ==
-            this.buy_option[1].list[k].prop_value_id
-          ) {
-            this.buy_option_color.push(this.buy_option[1].list[k]);
-          }
-        }
-      }
+    //选中对应的属性选项
+    clickVersion(id, idx) {
+      this.selected_attr_list[idx] = id;
+      this.attrShowIdx(idx);
+      this.getGoodsChangeIndex();
+      this.$forceUpdate();
     },
     //点击选择颜色
     clickColor(color) {
@@ -1120,6 +1111,43 @@ export default {
     //点击返回上一页
     clickReturnPreviousPage() {
       this.$router.go(-1);
+    },
+    // 处理商品属性项是否显示 idx: buy_option的索引下标
+    attrShowIdx(idx) {
+      let len = this.selected_attr_list.length;
+      let start = 0;
+      let goods_list = this.goods_info.map((item) => item); // 筛选过滤匹配的商品
+      while (start <= idx) {
+        goods_list = goods_list.filter(
+          (item) =>
+            item.prop_list[start].prop_value_id ==
+            this.selected_attr_list[start]
+        );
+        start++;
+      }
+      while (start < len) {
+        let attr_list = [];
+        for (let i = 0; i < goods_list.length; i++) {
+          if (
+            !attr_list.includes(goods_list[i].prop_list[start].prop_value_id)
+          ) {
+            attr_list.push(goods_list[i].prop_list[start].prop_value_id);
+          }
+        }
+        if (!attr_list.includes(this.selected_attr_list[start])) {
+          this.selected_attr_list[start] = attr_list[0];
+        }
+        this.buy_option[start].show_attr_list = attr_list;
+        start++;
+      }
+    },
+    // 当前选中商品的索引下标
+    getGoodsChangeIndex() {
+      this.change_index = this.goods_info.findIndex((item) => {
+        return item.prop_list.every(
+          (prop, index) => prop.prop_value_id == this.selected_attr_list[index]
+        );
+      });
     },
   },
 };
@@ -2326,7 +2354,6 @@ export default {
     background-color: #ff6700;
     width: 16.664rem;
     height: 2.078rem;
-    z-index: 0;
   }
 }
 
