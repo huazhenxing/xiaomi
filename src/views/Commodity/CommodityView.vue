@@ -899,50 +899,12 @@ export default {
       recommend_goods_arr: [], //推荐商品数组
       recommend_goods_index: 0, //推荐商品索引
 
-      choose: true, //点击选择产品
+      choose: false, //点击选择产品
       view: false, //点击查看服务说明
       goods_count: 1, //选中几件
       buy_option: null, //商品属性选项选择
       selected_attr_list: [], // 选中属性列表
       change_index: 0, //选中商品索引
-
-      // produce_detail: [
-      //   {
-      //     name: "k40",
-      //     version: [
-      //       {
-      //         version_name: "8+128",
-      //         color: ["黑", "白", "红", "蓝"],
-      //       },
-      //       {
-      //         version_name: "8+256",
-      //         color: ["黑", "白", "红", "蓝"],
-      //       },
-      //       {
-      //         version_name: "12+128",
-      //         color: ["黑", "白", "红"],
-      //       },
-      //     ],
-      //   },
-
-      //   {
-      //     name: "k40pro",
-      //     version: [
-      //       {
-      //         version_name: "6+128",
-      //         color: ["黑", "白", "红", "蓝"],
-      //       },
-      //       {
-      //         version_name: "6+256",
-      //         color: ["黑", "白", "红", "蓝"],
-      //       },
-      //       {
-      //         version_name: "8+128",
-      //         color: ["黑", "白", "红"],
-      //       },
-      //     ],
-      //   },
-      // ],
     };
   },
 
@@ -961,34 +923,20 @@ export default {
     }).then((res) => {
       console.log("数据==>", res);
 
-      //华振锋写的
-      // let produceOption = res.data.data.buy_option;
-
-      // for (var i = 0; i < produceOption.length; i++) {
-      //   //如果有不同产品，添加不同产品的名称
-      //   if (produceOption[i].name == "产品") {
-      //     for (var j = 0; j < produceOption[i].list.length; j++) {
-      //       this.produce_detail[j].name = produceOption[i].list[j].name;
-      //     }
-      //   }else if(produceOption[i].name == "版本"){
-      //     // 获取不同版本
-      //     for(var k = 0; k < produceOption[i].list.length; k++){
-
-      //     }
-      //   }
-      // }
-
       if (res.data.data == null) {
         return;
       }
 
       this.goods_info = res.data.data.goods_info;
+      // 初始化默认选中第一个商品：索引下标 0
       this.change_index = 0;
+      // 初始化获取选中商品属性列表 
       this.selected_attr_list = this.goods_info[
         this.change_index
       ].prop_list.map((item) => item.prop_value_id);
       this.buy_option = res.data.data.buy_option;
       this.buy_option.forEach((item) => {
+        // 初始化属性列表全部显示
         item.show_attr_list = item.list.map((item) => item.prop_value_id);
       });
       this.attrShowIdx(0);
@@ -1117,6 +1065,7 @@ export default {
       let len = this.selected_attr_list.length;
       let start = 0;
       let goods_list = this.goods_info.map((item) => item); // 筛选过滤匹配的商品
+      // 过滤符合索引下标之前（包含当前）所有属性的商品
       while (start <= idx) {
         goods_list = goods_list.filter(
           (item) =>
@@ -1125,6 +1074,7 @@ export default {
         );
         start++;
       }
+      // 获取索引下标之后（不包含当前）的显示属性列表
       while (start < len) {
         let attr_list = [];
         for (let i = 0; i < goods_list.length; i++) {
@@ -1134,6 +1084,7 @@ export default {
             attr_list.push(goods_list[i].prop_list[start].prop_value_id);
           }
         }
+        // 判断当前属性显示列表是否包含当前选择属性值，如果没有，修改为显示列表第一项
         if (!attr_list.includes(this.selected_attr_list[start])) {
           this.selected_attr_list[start] = attr_list[0];
         }
@@ -1144,6 +1095,7 @@ export default {
     // 当前选中商品的索引下标
     getGoodsChangeIndex() {
       this.change_index = this.goods_info.findIndex((item) => {
+        // every遍历方法：所有条件都符合返回true,否则返回fasle
         return item.prop_list.every(
           (prop, index) => prop.prop_value_id == this.selected_attr_list[index]
         );
