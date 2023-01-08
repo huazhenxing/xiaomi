@@ -25,7 +25,7 @@
 
         <!-- 右边商品列表 -->
         <div class="swiper-container swiper-container-vertical">
-          <div class="swiper-slide swiper-slide-active" style="height: 565px">
+          <div class="swiper-slide swiper-slide-active">
             <div
               class="component-list-main"
               v-for="(item, index) in category_list"

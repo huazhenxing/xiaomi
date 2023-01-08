@@ -49,5 +49,17 @@
     "> 1%",
     "last 2 versions",
     "not dead"
-  ]
+  ],
+  "description": "```\r yarn install\r ```",
+  "main": "babel.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/huazhenxing/xiaomi.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/huazhenxing/xiaomi/issues"
+  },
+  "homepage": "https://github.com/huazhenxing/xiaomi#readme"
 }
