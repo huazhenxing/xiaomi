@@ -132,7 +132,7 @@ export default {
         }
       }, 500);
     },
-
+    //本地存储
     historicalRecord: function (newValue) {
       window.localStorage.setItem("historicalRecord", JSON.stringify(newValue));
     },
@@ -170,11 +170,25 @@ export default {
         texts: texts,
       });
     },
+
     commodityList(str, url) {
+      // //过滤重复
+      // this.historicalRecord = this.historicalRecord.filter(
+      //   (m) => m.str !== str
+      // );
+
+      // //数据添加
+      // this.historicalRecord.unshift({
+      //   id: Date.now(),
+      //   texts: str,
+      // });
+      // console.log("this.historicalRecord", this.historicalRecord);
+
       this.value = str;
       this.isShow = true;
       this.$router.push({ path: url, query: { key: str } });
     },
+
     clickReturn() {
       this.$router.go(-1);
     },

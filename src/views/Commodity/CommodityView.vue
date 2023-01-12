@@ -11,6 +11,7 @@
           <!-- 商品导航 -->
           <div class="placeholder">
             <span class="current">商品</span>
+            <!-- <a href="#evaluate"> </a> id="evaluate"-->
             <span>评价</span>
             <span>详情</span>
             <span>推荐</span>
@@ -184,6 +185,7 @@
         <div class="product_info_choose_version">
           <div class="card-box">
             <div class="product-section-box">
+              <!-- 已选 -->
               <div
                 class="product-section padding-26-0-0-32"
                 @click="clickChoose"
@@ -270,7 +272,6 @@
                                 attr.prop_value_id == selected_attr_list[index],
                             }"
                           >
-                            <!-- on -->
                             <p>{{ attr.name }}</p>
                           </div>
                         </template>
@@ -446,6 +447,7 @@
                 </div>
               </van-action-sheet>
 
+              <!-- 送至 -->
               <div class="product-section padding-26-0-0-32">
                 <div class="ui-flex">
                   <div class="title fz-xs">送至</div>
@@ -458,7 +460,7 @@
                           class="location-icon"
                         />
                         <span class="mr1x">北京市 东城区</span>
-                        <span class="on"> 该地区暂时缺货</span>
+                        <span class="on"> 有现货</span>
                         <div class="right-icon"></div>
                       </div>
                     </div>
@@ -467,6 +469,7 @@
               </div>
             </div>
 
+            <!-- 服务 -->
             <div
               class="product-section padding-16-32 sevice-section more"
               @click="clickView"
@@ -500,7 +503,8 @@
                 </div>
               </div>
             </div>
-            <van-action-sheet v-model="view" title="服务说明">
+            <!-- 服务说明 -->
+            <van-action-sheet v-model="view" title="服务说明" v-if="goods_info">
               <div class="pop">
                 <div
                   class="service-item layout"
@@ -517,20 +521,6 @@
                     <div class="service-title">{{ item.title }}</div>
                     <div class="service-desc" v-if="item.desc">
                       {{ item.desc }}
-                      <!-- item.desc要进行处理 -->
-                    </div>
-                  </div>
-                </div>
-                <div class="service-item layout">
-                  <img
-                    class="service-icon"
-                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACUAAAAlCAYAAADFniADAAAGwElEQVRYw6WYXWwcVxXHf+fOrNeOGxSaTWQgomCFKJZ4ocoDsi1KPkxdGT8h1AeE++E2TaOGoloIVURoVfHUKBRaqVBDIuIQQkQaIZwopqaQtEmUiIAEL7bSjzRVRVzbUAun2LvrvYeH2Z29d2ZsHLrSaOfO3r3nP//zP+eec4Xb+Ojz5JlqXUfARpYq/WjQCdKBmgJWWlBZwMosEkxg5RKEo1idxn5sTl54s7RaO7IqMEVCqmEXSh9WulHZhkoONaBC9O3e17+pYM1VMBcgPMP6zReleG7pI4FSEPazFcwQ0IOaTVgxqAEMWKkBWAmYgIqF4D2sjENwkBdvTArobYPSIgboxcohrLR5xq1EoFzj8bOMebY2RsCaKQIZZMONMSliVw1KixSAAaoUUVnrLawJQz4jPmuIM89z9TwERdSMyPC12f8JSosUsHwfZTdIPjZkTYOJTIAZYAkiJ9k6KECD2m9SQmUYCZ5JAjMpl1UZAHYD+WgRh/r6GAGpu6v+bg4wnN/q8+vPYmMmj2naTcc9A6pqMkFp9K9eoIjWAMWGHED151YaS+gy82J3khgLhE2w88E8e35YBHpVVVLu0/10YPgjSltszGZF1nJjST+zpvFi6rg2zMNXHoV7H4GWtQBTwA4RmYiZ0iIhhiGoAVIBm3g7SBgmwZCk2cBhuz4vbIL+J6Fvbx0QNbtDqn8KG+6r0oXSE2cOdTTgGkV8DZFwTaynZebnmmHXIOwcgFy+IaLqElw+28PeZ7oAjD5PHqEP2OQDkvS9Oh6Px8ZhEl/cLmtBE2x/AHofg6aWBqDSAoz/Cg4XN/HhB326b3M+ZIp1BHRHq4tv1KPfjTKTiKqEnrw1ahrqexJ2PAD5NQ1A5UUYOwKnD0OpZMB0M9u8LqSZjVTYhiR1kYgeL1vjAHEYykoFJgf3Pg49j0CYawCyVTj/Mpz+OZTL9bSzjXx+Y0iFfiCHVT8n4URO01ro+Cq0FmDiDzDzdkIvTh6LclA0DnKw/SHY9bAPqLwIr5+Ckz+qAYrdnaMs/SFCZ1q8zpVbA7uehq49YEL4fD/8+lswe8PRVjIwgCAPvU/Azoeh+Q5fQ68cgdGfQamcCCZA6TRAR2aSrN9/6m74wv2RLkwA7Z2w5xSsb/e15SbJoCnSUO/jPqClCrx6DM4cglKploTxWRc6DEohM3zrOro1E11xuhVYfxd840Vo2wqS0FCuBbYPwvYHI/fFgMrw+kn43U9gcYFYw67daFwwqLR4WTe5NUy/CaP7Yfqav3N/5m742g9gw+bG4kEedjwK9z0B+VbHZf+BV34BJw5AabGhu1T6AVRbDLCQ3jgdsSLwxmtw7DGYmnQYM/C5bnjop1D4bJSp+56C+/a5mRoqizB+BE6/VAPkRG1Kk4DIguj3zFuoaV9VrdTeBff/GDa0+6zdvAZvXIEvfh2amv2wP3cCfnMg0lCyBPLGcVp824CZ8P1KtngReOsyvPw0zFz3QX1iC3zpmz6g8gK8ehROHnAYytqaEoWxMmHAXEqlgsw9rnZNnIMje+Efk8sX9+UF+P1hOPVclALqhSEZG3myzhQuGUxuFCuV1LbhsWb8SuHdv8Gxp2DmnTQgW4XzJ+DsS1AupdlxC774WUOBiI4aqkyDXPVr7OTGnFHw3fg7nNgP09d9UZ8/Dr99rgbIYUWyotskWJKr2HDa0PbhHMgFEJuiN1UvJYBPvAa//C5c/yvMvQ9jw3Dy2YbLskoZZLn2wKJygcKdcwKg37njHkRHsPLpRsiahg6STQOJJnTNx6McNf9vqFT83y1Z3Uxa4MK7qAzI8T+fj/hrvXURzLhfgixTo5PB2K05mJuJthFI1PMmI2DIakXHudl6Ma48pcgSNB0EmUp1J6nKMyuCjK8TXcbdKo2tyv9MEYQH5VzU0jeU9uw/J5FgEMy8t0Ayh7mlileBkq2bzNLac9s8Egxy9PJkqsUSUFo/GAMpgillvikrtEzJ3tDdOmwSeGNXRE2RLVfGXKheTEoRi1RGUDOMSimdt5LgMup2lx1LOve5gGAYqiPJM4Xss4ShTxaoLA1EMM3alfu7YIX+rxZ9BH7bJcyjpgjVETn+l9nbO3X5V1svVTmEmrbMpjILyEqHIXVRSzDIliu3d+ritfLfvmsr5eoQVnpANqHGLMtKVpcclSkWzHvAOEF4kKOX/7/zKZ+1L4e8/04XVvpQ7YZgG5ZcZkK0bqtlKli5ipoLIGe42XqxHvYf+XgxBrdvc56F6jpMfiPW9iN0Uq2deaqpnXmaWcRMAJcwwSilcJrCnXPywtlVn3n+F250mRN9PmyJAAAAAElFTkSuQmCC"
-                    alt=""
-                  />
-                  <div class="service-text flex">
-                    <div class="service-title">运费说明</div>
-                    <div class="service-desc">
-                      由小米发货商品(不含有品),单笔满69元免运费;<br />由小米有品发货的商品,免运费;<br />由第三方商家发货的商品，运费以实际结算金额为准;<br />特殊商品需要单独收取运费,具体以实际结算金额为准;优惠券等不能抵扣运费金额;如需无理由退货,用户将承担该商品的退货物流费用;<br />使用门店闪送服务，需单独支付10元运费。
                     </div>
                   </div>
                 </div>
@@ -604,7 +594,10 @@
                 </div>
               </div>
 
-              <div class="swiper-slide view-all">
+              <div
+                v-if="comments.list.length > 1"
+                class="swiper-slide view-all"
+              >
                 <div class="view-all-text">
                   查看全部
                   <img
@@ -624,7 +617,7 @@
       </div>
 
       <!-- 米粉点评团 -->
-      <div class="section">
+      <div class="section" v-if="topic">
         <div class="product_info_content">
           <div class="topic-header ui-flex align-center justify-space-between">
             <div class="topic-title">米粉点评团</div>
@@ -670,7 +663,10 @@
                 </div>
               </div>
             </div>
-            <div class="topic-more layout column align-center justify-center">
+            <div
+              v-if="topic.length > 3"
+              class="topic-more layout column align-center justify-center"
+            >
               查看更多
               <img
                 src="https://m.mi.com/static/img/icon-arrow-right.5d0f572caf.png"
@@ -682,7 +678,7 @@
       </div>
 
       <!-- 商品轮播图 -->
-      <div class="section">
+      <div class="section" v-if="swiper">
         <div class="product_info_comment">
           <div class="swiper-container swiper-ads swiper-container-horizontal">
             <van-swipe
@@ -808,11 +804,17 @@
         <van-goods-action-icon icon="chat-o" text="客服" />
         <van-goods-action-icon icon="cart-o" text="购物车" badge="5" />
         <van-goods-action-icon icon="shop-o" text="店铺" />
-        <van-goods-action-button type="warning" text="加入购物车" />
+        <van-goods-action-button
+          type="warning"
+          text="加入购物车"
+          @click="clickChoose"
+        />
         <van-goods-action-button type="danger" text="立即购买" />
       </van-goods-action>
     </div>
-    <div class="no-data" v-else>
+
+    <!-- 商品数据不存在 -->
+    <div class="no-data" v-if="non_existent.description">
       <img
         src="https://m.mi.com/static/img/empty.37c0abdde7.png"
         alt=""
@@ -876,7 +878,7 @@ export default {
       current: 0,
       active: 0, //默认选中状态
 
-      // idx: 0, //选中状态
+      non_existent: "", //商品不存在
 
       data: null, //商品全部数据
       goods_info: null, //商品信息
@@ -921,7 +923,7 @@ export default {
         pid: this.$route.params.id,
       },
     }).then((res) => {
-      console.log("数据==>", res);
+      this.non_existent = res.data;
 
       if (res.data.data == null) {
         return;
@@ -930,7 +932,7 @@ export default {
       this.goods_info = res.data.data.goods_info;
       // 初始化默认选中第一个商品：索引下标 0
       this.change_index = 0;
-      // 初始化获取选中商品属性列表 
+      // 初始化获取选中商品属性列表
       this.selected_attr_list = this.goods_info[
         this.change_index
       ].prop_list.map((item) => item.prop_value_id);
@@ -950,9 +952,6 @@ export default {
       if (res.data.data.hot_parts) {
         this.hot_recommend = res.data.data.hot_parts.parts;
       }
-
-      // this.buy_option_version = this.buy_option[0].list;
-      // console.log("version", this.buy_option_version);
 
       //过滤数据
       for (var i = 0; i < this.sections.length; i++) {
@@ -1106,6 +1105,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+// * {
+//   scroll-behavior: smooth;
+// }
+// a {
+//   text-decoration: none;
+//   color: #3c3c3c;
+// }
 // 选择商品类型开始
 .pop {
   padding: 0px 16.667px 66.146px;
@@ -2077,7 +2083,7 @@ export default {
             }
             .real-img {
               position: absolute;
-              z-index: 1;
+              z-index: 0;
               top: 0;
               bottom: 0;
               left: 0;

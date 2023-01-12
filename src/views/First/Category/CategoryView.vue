@@ -206,9 +206,6 @@ export default {
         }).then((res) => {
           this.title_list = res.data.data[0].title_list;
           this.category_list = res.data.data[0].category_list;
-          // console.log("所有数据==>", res);
-          // console.log("导航列表==>", this.title_list);
-          // console.log("商品列表==>", this.category_list);
         });
       }
     },
