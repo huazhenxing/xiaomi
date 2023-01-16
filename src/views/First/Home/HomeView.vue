@@ -639,9 +639,10 @@ import HomeOptions from "@/views/First/Home/components/HomeOptions.vue";
 import HomePublicComponent from "@/views/First/Home/components/HomePublicComponent.vue";
 
 import Vue from "vue";
-import { Tab, Tabs } from "vant";
+import { Tab, Tabs, Toast } from "vant";
 Vue.use(Tab);
 Vue.use(Tabs);
+Vue.use(Toast);
 export default {
   name: "HomeView",
   components: {
@@ -667,11 +668,15 @@ export default {
   computed: {},
   watch: {},
   created() {
+    Toast.loading({
+      message: "加载中...",
+      forbidClick: true,
+    });
     //推荐
     this.axios.get("home/page").then((res) => {
+      Toast.clear();
       this.navData = res.data.data.tabs;
       this.recommendData = res.data.data.data.sections;
-      console.log("推荐数据", this.recommendData);
     });
   },
 
@@ -683,7 +688,6 @@ export default {
           this.axios.get("home/page").then((res) => {
             this.navData = res.data.data.tabs;
             this.recommendData = res.data.data.data.sections;
-            console.log("推荐数据", this.recommendData);
           });
           break;
         case 1:

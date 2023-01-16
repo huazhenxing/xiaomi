@@ -32,7 +32,6 @@
             <div class="handler-item">
               <span>{{ item.support }}</span>
               <img
-                @click="clickSwitch(index)"
                 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAEt0lEQVRoQ+2ZaahVVRTHfzZZaWXQYJKNhkQTRRQVEYUNGEEGDTZgYBAVFEVEBH7Jvlgg2PSlUkIqKirCSs0gspHAJhpsgiRKM5u0stIsfrGObHane86799x3z4MWXN6795yz9/rvNf3XOqMY4TJqhOvP/wASC24D7ARsC2wCfge29NvCTVlgZ+BkYH9gR2A98BXwYfztG44mAGwHXAAcCWiFQjz9n4GXgFf7ZY0mABwCXAyMSVxHKwhM+QN4DnijHyB6BeDzpwGnx+m/E4pOAI4C9oN/EsU6YAHwbdO+1CuAHYDzgGPi9BcFANfdC7gU2DuUfgF4vm0AdBuVPBj4FXgE+DhRUmAXxXetcAfwV5MgerXAOOCKOO2fgPnA6kRB0+otwOhQfHYEdmMYegWwJ3BtKPgdcC+wIdPuJmCP+O0u4MvGtI8A62U9XefKWOBr4M6STHM9sE/ccw+wqpcN82d7tcApwNmx6Arg0RLlUgvMBda0CYCnrxWUJyMDpfpJK24LemHwzoq60BiGXixgerwh3PBP4Hbgh0yzA4Cr4zdjZE5jmsdC3QIwu5wPHB7rfAA8WKLcOcGRvPQ68FQbAFi8zgBODLog63wA+CJTToJ3VVLIFgKflwDQtTZ2Cyy3wPbBafTd9Jr/q7gucTwwPjbUdV4BlgKbMyUOBS4EBFIlHsJK4OVgr65bS1Il5S8nAAcGiPSaLFMAOdt8C1gS9DkP3jMBs9RQ3NRqviySQS0QxeLyFhml+brOhtJkFX8P+K3kqMbG6UvmqkRreziFuPbjwEdVD3pdZaW9U4GT4rsK/ZJxFiuu/N7PE4BB27Xflii2L3AuMDF0eBN4OghiRxwC2AW4LPxbXyxONjXhrUmFtTD1Q8xoZjYznAnBoM9pyb/2FcBuQcjM6xIyM0peLc3xhfQLgO42Iw7UdtT+wda00gI5gPuBb7KnhgPAEWEBu7lPgIeDoo8IAHlnZw/9bElqruVCg7CA/YKd3dGh9DPAa1XuU2ShNrjQrsDlgNnIDPgQ8NlIAmACuSZmSt9HY1QZwG2yQNo7fwroxrV657I0OogYcDB2bLjMYuDFzH3U077DomuG2jqybAMAdbgZ2D2ULuubpToClDC+nc6X2gBAmnJjUAjJnJOLlAVYmY8DDHRFrrS8uKcNAGTA00K5vDGS/U4O90lJplTDe7e0AYA8zCqsSOAsYoU4jjHArROpOL53jLlm0AB0D9OnPq7b3J2M46XZjuwlm2Vij71i0ABSArc20uePEQ+HRXPVqZ6tHDQAM4t9gA3N+8Bj0SD5XVqhhTrJxkECMEDPStpOc7+9tTm+6MHTFrYMyNYgnhmNetmA1gf7Qaf17enApBh2ORizx1aGBMD+1RH5QbGQr4RMUWkuvi6BP6/CrHUuO6nwBYj53eoq/7kPMDCVIbmQ0T4FODWmDr4Syvvdooi4eC2SVYHCPQVRuIgvP5xGFPxHC9QOYveSUl8Sr4Sq/K7OCde9xx783RgU5OStdhotNhOEQ6uyuVBdhere5+RDt/FtjtlHq5dJrUKWPijq4mV1XWW6uc9Mo9J+OtHmWlSiGwWG85lKMjecynS7V0c63e2iw/ncfzY0fwNGvywUlioD+QAAAABJRU5ErkJggg=="
                 alt=""
               />
@@ -113,19 +112,10 @@ export default {
   data() {
     return {
       isClick: false, //点击显示有用、无用板块
-      // idx: 0,
     };
   },
 
-  methods: {
-    clickSwitch(index) {
-      console.log(index);
-      let idx = 0;
-      if (idx == index) {
-        this.isClick = true;
-      }
-    },
-  },
+  methods: {},
 };
 </script>
 

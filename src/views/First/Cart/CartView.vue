@@ -1,7 +1,7 @@
 <template>
   <div class="app-shell">
     <header class="app-shell-header">
-      <div class="app-header-left">
+      <div class="app-header-left" @click="clickReturn">
         <div class="app-header-item" href="">
           <i class="image-icons app-header-icon icon-back"></i>
         </div>
@@ -9,7 +9,7 @@
       <div class="app-header-middle">
         <div class="app-header-title">购物车</div>
       </div>
-      <div class="app-header-right">
+      <div class="app-header-right" @click="JumpView(`/search`)">
         <div class="app-header-item" href="">
           <i class="image-icons app-header-icon icon-back"></i>
         </div>
@@ -22,6 +22,7 @@
           <p>温馨提示：产品是否购买成功，以最终下单为准，请尽快结算</p>
         </div>
         <div class="ui-line"></div>
+
         <div class="page-wrap">
           <div class="nologin">
             <div href="" class="box-flex">
@@ -30,7 +31,7 @@
             </div>
           </div>
           <!-- 商品为空 -->
-          <div class="noitems">
+          <div class="noitems" v-if="!goods_info.length > 0">
             <div class="router-link-active">
               <span>购物车还是空的</span>
               <em>去逛逛</em>
@@ -39,84 +40,51 @@
           <!-- 商品不为空 -->
           <div class="cart-list">
             <ol>
-              <li class="item">
+              <li class="item" v-for="(item, index) in goods_info" :key="index">
                 <div class="ui-flex justify-center">
-                  <div class="choose unchecked"></div>
-                  <div class="imgProduct">
-                    <img
-                      src="https://cdn.cnbj1.fds.api.mi-img.com/nr-pub/202207191150_50b73aeedeeb27392a15d9d479e5d793.png"
-                      alt=""
-                    />
+                  <!-- 是否选中该商品 checked选中 unchecked没选中-->
+                  <div
+                    :class="['choose', item.state ? 'checked' : 'unchecked']"
+                    @click="clickIsSelect(index)"
+                  ></div>
+                  <div
+                    class="imgProduct"
+                    @click="JumpView(`/commodity/detail/${item.goods_id}`)"
+                  >
+                    <img :src="item.img_url" alt="" />
                   </div>
                   <div class="info">
                     <div class="item-text ui-flex align-start">
-                      <div class="name">Redmi G 游戏本 2022 i7 3050Ti 灰色</div>
+                      <div class="name">{{ item.name }}</div>
                     </div>
 
                     <div class="price-without">
                       <span>售价：</span>
-                      <span class="mr-10">8299元</span>
+                      <span class="mr-10">{{ item.price }}元</span>
                     </div>
 
                     <div class="num">
                       <div class="xm-input-number">
-                        <div class="input-sub">
+                        <!-- - -->
+                        <div class="input-sub" @click="clickIncrement(index)">
                           <i class="image-icons icon-line"></i>
                         </div>
+                        <!-- 数量 -->
                         <div class="input-num">
-                          <span>1</span>
+                          <span>{{ item.goods_count }}</span>
                         </div>
-                        <div class="input-sub">
+                        <!-- + -->
+                        <div class="input-sub" @click="clickDecrement(index)">
                           <i class="image-icons icon-cross"></i>
                         </div>
                       </div>
-                      <div class="delete">
+                      <!-- 删除 -->
+                      <div class="delete" @click="clickDelete(index)">
                         <i class="image-icons icon-delete"></i>
                       </div>
                     </div>
                   </div>
                 </div>
-                <div class="ui-line"></div>
-              </li>
-
-              <li class="item">
-                <div class="ui-flex justify-center">
-                  <div class="choose checked"></div>
-                  <div class="imgProduct">
-                    <img
-                      src="https://cdn.cnbj1.fds.api.mi-img.com/nr-pub/202207191150_50b73aeedeeb27392a15d9d479e5d793.png"
-                      alt=""
-                    />
-                  </div>
-                  <div class="info">
-                    <div class="item-text ui-flex align-start">
-                      <div class="name">Redmi G 游戏本 2022 i7 3050Ti 灰色</div>
-                    </div>
-
-                    <div class="price-without">
-                      <span>售价：</span>
-                      <span class="mr-10">8299元</span>
-                    </div>
-
-                    <div class="num">
-                      <div class="xm-input-number">
-                        <div class="input-sub">
-                          <i class="image-icons icon-line"></i>
-                        </div>
-                        <div class="input-num">
-                          <span>1</span>
-                        </div>
-                        <div class="input-sub">
-                          <i class="image-icons icon-cross"></i>
-                        </div>
-                      </div>
-                      <div class="delete">
-                        <i class="image-icons icon-delete"></i>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
                 <div class="append flex">
                   <div class="insurance">
                     <div class="i1">
@@ -134,11 +102,10 @@
                     </div>
                   </div>
                 </div>
-
                 <div class="ui-line"></div>
               </li>
 
-              <li class="item">
+              <!-- <li class="item">
                 <div class="batch flex">
                   <div class="batch-item">
                     <div class="batch-img">
@@ -157,7 +124,7 @@
                   </div>
                 </div>
                 <div class="ui-line"></div>
-              </li>
+              </li> -->
             </ol>
           </div>
 
@@ -167,11 +134,53 @@
               <img :src="img_url" alt="" />
             </div>
             <div class="wrap">
-              <CartRecommendedGoods
-                v-for="(item, index) in recommendedGoods"
-                :key="index"
-                :item="item"
-              />
+              <div
+                class="goods-item"
+                v-for="item in recom_list"
+                :key="item.action.path"
+                @click="JumpView(`/commodity/detail/${item.action.path}`)"
+              >
+                <div class="goods-img-box">
+                  <img :src="item.image_url" alt="" />
+                </div>
+                <div class="goods-info">
+                  <div class="goods-name">{{ item.name }}</div>
+                  <div class="goods-price">
+                    <span>￥</span> {{ item.price }}
+                    <del v-if="item.price !== item.market_price" class="price">
+                      <span>￥</span>{{ item.market_price }}
+                    </del>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 提交订单 -->
+        <div class="bottom-submit" v-if="goods_info.length > 0">
+          <div class="box-flex">
+            <div class="price-box">
+              <div class="quantity">
+                <span>共{{ quantity }}件 金额：</span>
+              </div>
+              <div class="amount">
+                <strong>{{ amount }}</strong>
+                <span>元</span>
+                <div class="info">
+                  <span>明细</span>
+                  <img
+                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAALCAYAAAByF90EAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAEqADAAQAAAABAAAACwAAAAD3WUemAAAArklEQVQoFY2SURLCIAxEN71d9QTWv47HsvzpDRyPlyaBOFCgyAyFJrsPkoGYQbhjho4XvkRg2w8+lY8XXMT6Sb6ANx4jmEEWPMWzmo9wnQ4HrxCBCQ8J/60gKTFpObIPLpS1C+tAgrVEAV1BVuZIQ36TM6Fp8p5EU9HPH0hzXVg0xsY2IBoqQBrowDTlo7iJByuQJk5gTYjDmqvC+IZNJqe52QFNdaO0XGfGP1/9DjV5XZX36WcFAAAAAElFTkSuQmCC"
+                    alt=""
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="btn-box">
+              <div class="btn disable" @click="JumpView(`/category`)">
+                继续购物
+              </div>
+              <div class="btn">去结算</div>
             </div>
           </div>
         </div>
@@ -181,28 +190,60 @@
 </template>
 
 <script>
-//
-import CartRecommendedGoods from "@/views/First/Cart/components/CartRecommendedGoods.vue";
+import { mapGetters, mapState, mapMutations, mapActions } from "vuex";
 export default {
-  components: {
-    CartRecommendedGoods,
-  },
+  name: "CartView",
+  components: {},
   data() {
     return {
-      img_url: null,
-      recommendedGoods: null,
+      img_url: null, //商品推荐照片
+      recom_list: null, //商品推荐数据
     };
   },
+
   created() {
     //推荐
     this.axios.get("cart_recom").then((res) => {
-      console.log(res);
       this.img_url = res.data.data.header.body.items[0].img_url;
-      this.recommendedGoods = res.data.data.recom_list
-        ? res.data.data.recom_list
-        : [];
+      this.recom_list = res.data.data.recom_list;
     });
   },
+
+  mounted() {},
+
+  methods: {
+    //点击返回上一级
+    clickReturn() {
+      this.$router.go(-1);
+    },
+    //跳转到商品详情
+    JumpView(path) {
+      this.$router.push(path);
+    },
+
+    //借助mapMutations生成对应的方法，方法中调用commit去联系mutations(对象写法)
+    // ...mapMutations({yy:'XX'})
+    //借助mapActions生成对应的方法，方法中调用commit去联系actions(对象写法)
+    // ...mapActions({xx:'yy'})
+    ...mapMutations({ clickIsSelect: "IS_SELECT", clickDelete: "DELETE" }),
+    ...mapActions({ clickDecrement: "decrement", clickIncrement: "increment" }),
+  },
+
+  computed: {
+    //借助mapState生成计算属性，从state中读取数据。（对象写法）
+    // ...mapState({ y: "x" }),
+    //借助mapState生成计算属性，从state中读取数据。（数组写法）
+    // ...mapState([x]),
+    //借助mapGetters生成计算属性，从getters中读取数据。（对象写法）
+    // ...mapGetters({ y: "x" }),
+    //借助mapGetters生成计算属性，从getters中读取数据。（数组写法）
+    // ...mapGetters(["x"]),
+
+    ...mapState(["goods_info"]),
+    ...mapGetters(["quantity", "amount"]),
+  },
+
+  watch: {},
 };
 </script>
 
@@ -617,6 +658,107 @@ export default {
           flex-wrap: wrap;
           justify-content: space-between;
           overflow: hidden;
+          .goods-item {
+            flex: 0 1 49.5%;
+            overflow: hidden;
+            .goods-img-box {
+              img {
+                display: block;
+                width: 100%;
+                min-height: 185.625rem;
+              }
+            }
+            .goods-info {
+              padding: 9.375rem 13.542rem 11.458rem;
+              .goods-name {
+                font-size: 14.5833rem;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+              }
+              .goods-price {
+                font-size: 16.6667rem;
+                display: inline-block;
+                color: #ff6700;
+                margin-top: 5.20833rem;
+                span {
+                  font-size: 12.5rem;
+                }
+                .price {
+                  font-size: 12.5rem;
+                  margin-left: 5.20833rem;
+                  color: rgba(0, 0, 0, 0.54);
+                  text-decoration: line-through;
+                  span {
+                    font-size: 12rem;
+                    text-decoration: none;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    .bottom-submit {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      z-index: 99;
+      box-shadow: 0 3px 14px 2px rgb(0 0 0 / 12%);
+      margin: 0 auto;
+      max-width: 375rem;
+      .box-flex {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .price-box {
+          flex: 1;
+          font-size: 13.54rem;
+          color: #999;
+          text-align: left;
+          padding-top: 7.813rem;
+          padding-left: 15.625rem;
+          .amount {
+            display: flex;
+            align-items: baseline;
+            strong {
+              font-size: 20.8333rem;
+              color: #ff5722;
+              margin-right: 4.167rem;
+            }
+            .info {
+              color: #ff5900;
+              margin-left: 5.208rem;
+              display: flex;
+              align-items: center;
+              img {
+                width: 10.414rem;
+                height: 6.359rem;
+                margin-left: 2.604rem;
+                transform: rotate(180deg);
+              }
+            }
+          }
+        }
+        .btn-box {
+          display: flex;
+          .btn {
+            width: 105.156rem;
+            background: #ff6700;
+            color: #fff;
+            text-align: center;
+            line-height: 52.078rem;
+            font-size: 14.833rem;
+          }
+          .disable {
+            color: #333;
+            background: #f4f4f4;
+            line-height: 50.078rem;
+            border: 1px solid #f4f4f4;
+          }
         }
       }
     }

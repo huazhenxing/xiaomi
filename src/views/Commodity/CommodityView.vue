@@ -188,7 +188,7 @@
               <!-- 已选 -->
               <div
                 class="product-section padding-26-0-0-32"
-                @click="clickChoose"
+                @click="clickChoose('selected')"
               >
                 <div class="ui-flex">
                   <div class="title fz-xs">已选</div>
@@ -240,7 +240,7 @@
                       class="mt2x"
                       v-for="(item, index) in buy_option"
                       :key="item.prop_cfg_id"
-                      v-show="item.list"
+                      v-show="item.list && item.name != '通用'"
                     >
                       <div class="option-title">
                         {{ item.name }}
@@ -440,9 +440,38 @@
                     </div>
                   </div>
 
-                  <van-goods-action>
-                    <van-goods-action-button type="warning" text="加入购物车" />
-                    <van-goods-action-button type="danger" text="立即购买" />
+                  <van-goods-action v-if="isShow">
+                    <van-goods-action-button
+                      type="warning"
+                      text="加入购物车"
+                      @click="
+                        clickAddToCart({
+                          ...goods_info[change_index],
+                          goods_count: goods_count,
+                          state: true,
+                        })
+                      "
+                    />
+                    <van-goods-action-button
+                      type="danger"
+                      text="立即购买"
+                      @click="clickBuyNow"
+                    />
+                  </van-goods-action>
+
+                  <van-goods-action v-else>
+                    <van-goods-action-button
+                      type="danger"
+                      text="确定"
+                      @click="
+                        clickAddToCart({
+                          ...goods_info[change_index],
+                          goods_count: goods_count,
+                          state: true,
+                        })
+                      "
+                    />
+                    <!-- @click="clickDetermine" -->
                   </van-goods-action>
                 </div>
               </van-action-sheet>
@@ -712,11 +741,28 @@
                       :key="index"
                     >
                       <div class="product-tab" style="width: 342px">
-                        <CommodityDox
+                        <div
+                          class="product-item"
                           v-for="item in item"
                           :key="item.product_id"
-                          :item="item"
-                        />
+                          @click="
+                            jumpView(`/commodity/detail/${item.product_id}`)
+                          "
+                        >
+                          <div class="product-img">
+                            <img :src="item.image_url" alt="" />
+                          </div>
+                          <div class="product-name">{{ item.name }}</div>
+                          <div class="product-price">
+                            ￥{{ item.price }}
+                            <span>起</span>
+                            <span
+                              class="market-price"
+                              v-if="item.price != item.market_price"
+                              >￥{{ item.market_price }}</span
+                            >
+                          </div>
+                        </div>
                       </div>
                     </van-swipe-item>
                   </van-swipe>
@@ -734,11 +780,28 @@
                       :key="index"
                     >
                       <div class="product-tab" style="width: 342px">
-                        <CommodityDox
+                        <div
+                          class="product-item"
                           v-for="item in item"
                           :key="item.product_id"
-                          :item="item"
-                        />
+                          @click="
+                            jumpView(`/commodity/detail/${item.product_id}`)
+                          "
+                        >
+                          <div class="product-img">
+                            <img :src="item.image_url" alt="" />
+                          </div>
+                          <div class="product-name">{{ item.name }}</div>
+                          <div class="product-price">
+                            ￥{{ item.price }}
+                            <span>起</span>
+                            <span
+                              class="market-price"
+                              v-if="item.price != item.market_price"
+                              >￥{{ item.market_price }}</span
+                            >
+                          </div>
+                        </div>
                       </div>
                     </van-swipe-item>
                   </van-swipe>
@@ -761,7 +824,6 @@
       <div class="section">
         <div class="description-view">
           <div class="tab-header border-bottom-1px">
-            <!-- <span class="flex on">商品介绍</span> -->
             <span
               @click="clickDescription(index)"
               class="flex"
@@ -789,28 +851,60 @@
           <div class="recommend-box">
             <div class="recommend-title">商品推荐</div>
             <div class="recommend-list">
-              <RecommendGoodsItem
+              <div
+                class="goods-item"
                 v-for="item in recommend_goods"
                 :key="item.product_id"
-                :item="item"
-              />
+                @click="jumpView(`/commodity/detail/${item.product_id}`)"
+              >
+                <div class="goods-img-box">
+                  <img :src="item.image_url" alt="" />
+                </div>
+                <div class="goods-info">
+                  <div class="goods-name">{{ item.name }}</div>
+                  <div class="goods-price">
+                    <span>￥</span>{{ item.price }}
+                    <del class="price" v-if="item.price != item.market_price"
+                      ><span>￥</span>{{ item.market_price }}</del
+                    >
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- 购物车 -->
-      <van-goods-action>
-        <van-goods-action-icon icon="chat-o" text="客服" />
-        <van-goods-action-icon icon="cart-o" text="购物车" badge="5" />
-        <van-goods-action-icon icon="shop-o" text="店铺" />
-        <van-goods-action-button
-          type="warning"
-          text="加入购物车"
-          @click="clickChoose"
-        />
-        <van-goods-action-button type="danger" text="立即购买" />
-      </van-goods-action>
+      <!-- 加入购物车/立即购买 -->
+      <footer>
+        <div class="fill-height layout align-center bgw">
+          <div class="footer-btn" @click="jumpView(`/`)">
+            <i class="image-icons footer-icon icon-home"></i>
+            <span>首页</span>
+          </div>
+          <div class="footer-btn">
+            <div class="image-icons footer-icon icon-service"></div>
+            <span>客服</span>
+          </div>
+
+          <div class="footer-btn" @click="jumpView(`/cart`)">
+            <div class="image-icons footer-icon icon-cart"></div>
+            <span>购物车</span>
+            <em class="bubble">{{ quantity }}</em>
+          </div>
+
+          <div class="action-box flex align-center">
+            <div class="buy-btn-group">
+              <div class="btn buy-btn yellow" @click="clickChoose">
+                加入购物车
+              </div>
+              <div class="btn buy-btn orange" @click="clickChoose">
+                立即购买
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
 
     <!-- 商品数据不存在 -->
@@ -832,38 +926,40 @@
 </template>
 
 <script>
+import { mapGetters, mapState, mapMutations, mapActions } from "vuex";
 import Vue from "vue";
 import {
   Swipe,
   SwipeItem,
   ShareSheet,
   Toast,
-  GoodsAction,
-  GoodsActionIcon,
-  GoodsActionButton,
   Sku,
   Tab,
   Tabs,
   ActionSheet,
   Stepper,
+  Button,
+  GoodsAction,
+  GoodsActionIcon,
+  GoodsActionButton,
 } from "vant";
+
 Vue.use(Swipe);
 Vue.use(SwipeItem);
 Vue.use(ShareSheet);
-Vue.use(GoodsAction);
-Vue.use(GoodsActionButton);
-Vue.use(GoodsActionIcon);
 Vue.use(Sku);
 Vue.use(Tab);
 Vue.use(Tabs);
 Vue.use(ActionSheet);
 Vue.use(Stepper);
+Vue.use(Button);
+Vue.use(GoodsAction);
+Vue.use(GoodsActionButton);
+Vue.use(GoodsActionIcon);
 
-import CommodityDox from "@/views/Commodity/components/CommodityDox.vue";
-import RecommendGoodsItem from "@/views/Commodity/components/RecommendGoodsItem.vue";
 export default {
   name: "CommodityView",
-  components: { CommodityDox, RecommendGoodsItem },
+  components: {},
   data() {
     return {
       isClick: false, //点击分享
@@ -874,8 +970,7 @@ export default {
         { name: "分享海报", icon: "poster" },
         { name: "二维码", icon: "qrcode" },
       ], //分享选择
-
-      current: 0,
+      current: 0, //轮播图第几张
       active: 0, //默认选中状态
 
       non_existent: "", //商品不存在
@@ -907,12 +1002,13 @@ export default {
       buy_option: null, //商品属性选项选择
       selected_attr_list: [], // 选中属性列表
       change_index: 0, //选中商品索引
+
+      isShow: false, //显示加入和立即还是确定
     };
   },
 
   mounted() {
-    // 路由参数
-    console.log(this.$route.params.id);
+    // console.log("路由参数", this.$route.params.id);
 
     // 发送请求
     this.axios({
@@ -923,6 +1019,7 @@ export default {
         pid: this.$route.params.id,
       },
     }).then((res) => {
+      console.log("res==>", res);
       this.non_existent = res.data;
 
       if (res.data.data == null) {
@@ -930,7 +1027,7 @@ export default {
       }
 
       this.goods_info = res.data.data.goods_info;
-      // 初始化默认选中第一个商品：索引下标 0
+
       this.change_index = 0;
       // 初始化获取选中商品属性列表
       this.selected_attr_list = this.goods_info[
@@ -1005,19 +1102,34 @@ export default {
   },
 
   methods: {
-    onChange(index) {
-      this.current = index;
-    },
+    //加入购物车
+    // clickAddToCart(item) {
+    //   console.log("item==>", item);
+    // },
+    //立即购买
+    clickBuyNow() {},
+    //确定
+    clickDetermine() {},
 
-    // 点击分享
-    onSelect(option) {
-      Toast(option.name);
-      this.isClick = false;
+    ...mapMutations({ clickAddToCart: "ADD_TO_CART" }),
+
+    //跳转到其他页面
+    jumpView(path) {
+      this.$router.push(path);
     },
 
     //点击返回
     clickReturn() {
       this.$router.back();
+    },
+    // 点击分享
+    onSelect(option) {
+      Toast(option.name);
+      this.isClick = false;
+    },
+    //轮播图
+    onChange(index) {
+      this.current = index;
     },
 
     //点击描述
@@ -1026,10 +1138,14 @@ export default {
     },
 
     //点击选择产品
-    clickChoose() {
+    clickChoose(parameter) {
       this.choose = true;
+      if (parameter == "selected") {
+        this.isShow = true;
+      } else {
+        this.isShow = false;
+      }
     },
-
     //点击查看服务说明
     clickView() {
       this.view = true;
@@ -1044,11 +1160,8 @@ export default {
       this.selected_attr_list[idx] = id;
       this.attrShowIdx(idx);
       this.getGoodsChangeIndex();
+      //手动更新数据渲染
       this.$forceUpdate();
-    },
-    //点击选择颜色
-    clickColor(color) {
-      console.log(color);
     },
 
     //点击返回首页
@@ -1101,17 +1214,161 @@ export default {
       });
     },
   },
+
+  computed: {
+    ...mapGetters(["quantity"]),
+  },
+
+  watch: {
+    //刷新
+    $route(to, from) {
+      this.$router.go(0);
+    },
+  },
 };
 </script>
 
 <style lang="scss" scoped>
-// * {
-//   scroll-behavior: smooth;
-// }
-// a {
-//   text-decoration: none;
-//   color: #3c3c3c;
-// }
+// 购物车开始
+footer {
+  background: transparent;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 98;
+  width: 375rem;
+  margin: 0 auto;
+  .bgw {
+    background-color: hsla(0, 0%, 100%, 0.96) !important;
+    width: 100%;
+    height: 48rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    .footer-btn {
+      position: relative;
+      display: block;
+      text-decoration: none;
+      width: auto;
+      padding: 0 5.208rem;
+      color: rgba(0, 0, 0, 0.54);
+      text-align: center;
+      &:first-child {
+        padding-left: 10.417rem;
+      }
+      .footer-icon {
+        display: block;
+        width: 33.328rem;
+        height: 33.328rem;
+        &.icon-home {
+          background-image: url(https://m.mi.com/static/img/icon-home2.10a9b00d72.png);
+        }
+        &.icon-service {
+          background-image: url(https://m.mi.com/static/img/icon-service.1ffa47012a.png);
+        }
+        &.icon-cart {
+          background-image: url(https://m.mi.com/static/img/icon-cart2.f238ec784b.png);
+        }
+      }
+      span {
+        position: relative;
+        top: -2.604rem;
+        color: rgba(0, 0, 0, 0.54);
+        font-size: 12rem;
+      }
+      .bubble {
+        position: absolute;
+        width: 16.664rem;
+        line-height: 16.664rem;
+        height: 16.664rem;
+        box-sizing: border-box;
+        font-size: 12rem;
+        overflow: hidden;
+        text-align: center;
+        border-radius: 16.664rem;
+        background: linear-gradient(45deg, #ff7d00, #ff5934);
+        color: #fff;
+        top: 4.688rem;
+        left: 50%;
+        transform: translate3d(0.1rem, -20%, 0);
+        font-style: normal;
+      }
+    }
+  }
+  .action-box {
+    margin-right: 16.667rem;
+    margin-left: 5.208rem;
+    text-align: right;
+    .buy-btn-group {
+      width: 208.328rem;
+      display: inline-flex;
+      justify-items: center;
+      border-radius: 20rem;
+      overflow: hidden;
+      .buy-btn {
+        flex: 1;
+        border-radius: 0;
+        &.yellow {
+          background-image: linear-gradient(90deg, #fdcf00, #fd9b00) !important;
+        }
+        &.orange {
+          background-image: linear-gradient(90deg, #ff7310, #fe3f00) !important;
+        }
+      }
+    }
+    .buy-btn {
+      display: inline-block;
+      width: auto;
+      width: 104.164rem;
+      height: 37.5rem;
+      line-height: 37.5rem;
+      background: url(https://m.mi.com/static/img/icon-buy-btn.c3f7faffa2.png);
+      background-size: 100% 100%;
+      border-radius: 30rem;
+    }
+  }
+}
+.image-icons {
+  display: inline-block;
+  width: 37.5rem;
+  height: 37.5rem;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: 50%;
+  background-size: cover;
+}
+.flex {
+  -webkit-box-flex: 1;
+  flex: 1 1 auto;
+}
+.align-center {
+  -webkit-box-align: center;
+  align-items: center;
+}
+.layout {
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-flex: 1;
+  flex: 1 1 auto;
+  flex-wrap: nowrap;
+}
+.fill-height {
+  height: 100%;
+}
+.btn {
+  display: block;
+  outline: 0;
+  background: #ff6700;
+  color: #fff;
+  text-align: center;
+  width: 100%;
+  height: 37.5rem;
+  line-height: 37.5rem;
+  font-size: 14.5833rem;
+}
+// 购物车结束
+
 // 选择商品类型开始
 .pop {
   padding: 0px 16.667px 66.146px;
@@ -1324,8 +1581,6 @@ export default {
   }
 }
 // 选择商品类型结束
-
-// 服务说明开始
 
 // 服务说明开始
 .app-view {
@@ -2391,5 +2646,96 @@ export default {
 .flex {
   -webkit-box-flex: 1;
   flex: 1 1 auto;
+}
+
+// 商品推荐
+.goods-item {
+  flex: 0 1 49.5%;
+  overflow: hidden;
+  .goods-img-box {
+    img {
+      display: block;
+      width: 100%;
+      min-height: 3.56rem;
+    }
+  }
+  .goods-info {
+    padding: 9.375rem 13.542rem 11.458rem;
+    .goods-name {
+      font-size: 14.5833rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    .goods-price {
+      font-size: 16.667rem;
+      display: inline-block;
+      color: #ff6700;
+      margin-top: 5.208rem;
+      span {
+        font-size: 14rem;
+      }
+      .price {
+        font-size: 12rem;
+        margin-left: 5.208rem;
+        color: rgba(0, 0, 0, 0.54);
+        text-decoration: line-through;
+        span {
+          font-size: 12rem;
+        }
+      }
+    }
+  }
+}
+
+//爆款商品
+.product-item {
+  margin-bottom: 18.229rem;
+  margin-right: 7.813rem;
+  width: 108.328rem;
+  &:nth-child(3n) {
+    margin-right: 0rem;
+  }
+  .product-img {
+    display: block;
+    margin-bottom: 8.333rem;
+    height: 108.328rem;
+    border-radius: 8.333rem;
+    background-color: #f7f7f7 !important;
+    overflow: hidden;
+  }
+  .product-name {
+    margin-bottom: 4.688rem;
+    font-size: 12.5rem;
+    line-height: 18.75rem;
+    height: 37.5rem;
+    text-align: left;
+    color: #000;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  .product-price {
+    font-size: 12.5rem;
+    text-align: left;
+    font-weight: 600;
+    color: #ff6700;
+    span {
+      margin-left: 0.521rem;
+      font-size: 12rem;
+      font-weight: 400;
+    }
+    .market-price {
+      margin-left: 4.167rem;
+      font-size: 12rem;
+      color: rgba(0, 0, 0, 0.3);
+      text-decoration: line-through;
+      font-weight: 400;
+    }
+  }
 }
 </style>

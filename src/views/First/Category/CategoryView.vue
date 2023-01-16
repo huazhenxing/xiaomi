@@ -166,6 +166,10 @@
 </template>
 
 <script>
+import Vue from "vue";
+import { Toast } from "vant";
+
+Vue.use(Toast);
 export default {
   name: "CategoryView",
   components: {},
@@ -180,8 +184,15 @@ export default {
     };
   },
   created() {
+    Toast.loading({
+      message: "加载中...",
+      forbidClick: true,
+    });
+
     this.onclick(1242);
+
     this.axios.get("home/category_v2").then((res) => {
+      Toast.clear();
       this.nav_list = res.data.data;
     });
   },

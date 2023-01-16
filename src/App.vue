@@ -5,9 +5,10 @@
 </template>
 
 <script>
-
 export default {
- 
+  mounted() {
+    // console.log("App==>", this);
+  },
 };
 </script>
 
@@ -18,6 +19,4 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   color: #3c3c3c;
 }
-
-
 </style>

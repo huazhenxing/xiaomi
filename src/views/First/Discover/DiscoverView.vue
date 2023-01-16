@@ -110,9 +110,7 @@ export default {
     this.axios
       .get("https://apis.netstart.cn/xmsc/communicate/home_rec?after=1?size=10")
       .then((res) => {
-        if (this.rec_list) {
-          Toast.clear();
-        }
+        Toast.clear();
         this.rec_list = res.data.data.rec_list;
         console.log("rec_list==>", this.rec_list);
       });

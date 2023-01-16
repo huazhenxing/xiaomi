@@ -27,7 +27,7 @@
           </template>
         </van-tabbar-item>
 
-        <van-tabbar-item to="/cart" badge="5">
+        <van-tabbar-item to="/cart" :badge="quantity">
           <span>购物车</span>
           <template #icon="props">
             <img :src="props.active ? icon.activecart : icon.inactivecart" />
@@ -47,6 +47,7 @@
 </template>
 
 <script>
+import { mapGetters, mapState, mapMutations, mapActions } from "vuex";
 import Vue from "vue";
 import { Tabbar, TabbarItem } from "vant";
 
@@ -83,19 +84,23 @@ export default {
     };
   },
   mounted() {
-    if (this.$route.name == "DetailView") {
+    if (this.$route.name == "DetailView" || this.$route.name == "CartView") {
       this.RouteShow = false;
     } else {
       this.RouteShow = true;
     }
   },
   beforeRouteUpdate(to, from, next) {
-    if (to.name == "DetailView") {
+    if (to.name == "DetailView" || to.name == "CartView") {
       this.RouteShow = false;
     } else {
       this.RouteShow = true;
     }
     next();
+  },
+
+  computed: {
+    ...mapGetters(["quantity"]),
   },
 };
 </script>
