@@ -24,33 +24,29 @@
         <div class="ui-line"></div>
 
         <div class="page-wrap">
-          <div class="nologin">
+
+          <div class="nologin" @click="goLoginView(`/fe/service/login/phone`)" v-if="!token">
             <div href="" class="box-flex">
               <span class="flex">登录后享受更多优惠</span>
               <em class="flex">去登录</em>
             </div>
           </div>
+
           <!-- 商品为空 -->
-          <div class="noitems" v-if="!goods_info.length > 0">
+          <div class="noitems" v-if="!cartCommodityList.length > 0">
             <div class="router-link-active">
               <span>购物车还是空的</span>
-              <em>去逛逛</em>
+              <em @click="JumpHomeView('/')">去逛逛</em>
             </div>
           </div>
           <!-- 商品不为空 -->
           <div class="cart-list">
             <ol>
-              <li class="item" v-for="(item, index) in goods_info" :key="index">
+              <li class="item" v-for="(item, index) in cartCommodityList" :key="index">
                 <div class="ui-flex justify-center">
                   <!-- 是否选中该商品 checked选中 unchecked没选中-->
-                  <div
-                    :class="['choose', item.state ? 'checked' : 'unchecked']"
-                    @click="clickIsSelect(index)"
-                  ></div>
-                  <div
-                    class="imgProduct"
-                    @click="JumpView(`/commodity/detail/${item.goods_id}`)"
-                  >
+                  <div :class="['choose', item.state ? 'checked' : 'unchecked']" @click="clickIsSelect(index)"></div>
+                  <div class="imgProduct" @click="JumpView(`/commodity/detail/${item.product_id}`)">
                     <img :src="item.img_url" alt="" />
                   </div>
                   <div class="info">
@@ -85,13 +81,11 @@
                     </div>
                   </div>
                 </div>
-                <div class="append flex">
+                <!-- <div class="append flex">
                   <div class="insurance">
                     <div class="i1">
-                      <img
-                        src="https://cdn.cnbj0.fds.api.mi-img.com/b2c-shopapi-pms/pms_1653393475.27699056.png"
-                        alt=""
-                      />
+                      <img src="https://cdn.cnbj0.fds.api.mi-img.com/b2c-shopapi-pms/pms_1653393475.27699056.png"
+                        alt="" />
                     </div>
                     <div class="i2">
                       <span>小米手环7 夜跃黑</span>
@@ -101,7 +95,7 @@
                       <span>加价购</span>
                     </div>
                   </div>
-                </div>
+                </div> -->
                 <div class="ui-line"></div>
               </li>
 
@@ -129,36 +123,11 @@
           </div>
 
           <!-- 商品推荐 -->
-          <div class="recommend-box">
-            <div class="recommend-top-img">
-              <img :src="img_url" alt="" />
-            </div>
-            <div class="wrap">
-              <div
-                class="goods-item"
-                v-for="item in recom_list"
-                :key="item.action.path"
-                @click="JumpView(`/commodity/detail/${item.action.path}`)"
-              >
-                <div class="goods-img-box">
-                  <img :src="item.image_url" alt="" />
-                </div>
-                <div class="goods-info">
-                  <div class="goods-name">{{ item.name }}</div>
-                  <div class="goods-price">
-                    <span>￥</span> {{ item.price }}
-                    <del v-if="item.price !== item.market_price" class="price">
-                      <span>￥</span>{{ item.market_price }}
-                    </del>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <RecommendCommodity />
         </div>
 
         <!-- 提交订单 -->
-        <div class="bottom-submit" v-if="goods_info.length > 0">
+        <div class="bottom-submit" v-if="cartCommodityList.length > 0">
           <div class="box-flex">
             <div class="price-box">
               <div class="quantity">
@@ -171,8 +140,7 @@
                   <span>明细</span>
                   <img
                     src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAALCAYAAAByF90EAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAEqADAAQAAAABAAAACwAAAAD3WUemAAAArklEQVQoFY2SURLCIAxEN71d9QTWv47HsvzpDRyPlyaBOFCgyAyFJrsPkoGYQbhjho4XvkRg2w8+lY8XXMT6Sb6ANx4jmEEWPMWzmo9wnQ4HrxCBCQ8J/60gKTFpObIPLpS1C+tAgrVEAV1BVuZIQ36TM6Fp8p5EU9HPH0hzXVg0xsY2IBoqQBrowDTlo7iJByuQJk5gTYjDmqvC+IZNJqe52QFNdaO0XGfGP1/9DjV5XZX36WcFAAAAAElFTkSuQmCC"
-                    alt=""
-                  />
+                    alt="" />
                 </div>
               </div>
             </div>
@@ -180,7 +148,7 @@
               <div class="btn disable" @click="JumpView(`/category`)">
                 继续购物
               </div>
-              <div class="btn">去结算</div>
+              <div class="btn" @click="getPayment(`/order/checkout`)">去结算</div>
             </div>
           </div>
         </div>
@@ -191,13 +159,19 @@
 
 <script>
 import { mapGetters, mapState, mapMutations, mapActions } from "vuex";
+import RecommendCommodity from "@/components/RecommendCommodity.vue";
+import Vue from 'vue';
+import { Dialog } from 'vant';
 export default {
   name: "CartView",
-  components: {},
+  components: {
+    RecommendCommodity
+  },
   data() {
     return {
       img_url: null, //商品推荐照片
       recom_list: null, //商品推荐数据
+      token: JSON.parse(window.localStorage.getItem('token')) || null
     };
   },
 
@@ -209,15 +183,34 @@ export default {
     });
   },
 
-  mounted() {},
+  mounted() { },
 
   methods: {
+    JumpHomeView(path) {
+      this.$router.push(path);
+    },
+    JumpView(path) {
+      this.$router.push(path);
+    },
     //点击返回上一级
     clickReturn() {
       this.$router.go(-1);
     },
-    //跳转到商品详情
-    JumpView(path) {
+
+    //点击去结算
+    getPayment(path) {
+      if (this.quantity > 0) {
+        this.$router.push(path);
+      } else {
+        Dialog.alert({
+          message: '请勾选需要结算的商品',
+        }).then(() => {
+          // on close
+        });
+      }
+    },
+
+    goLoginView(path) {
       this.$router.push(path);
     },
 
@@ -239,11 +232,12 @@ export default {
     //借助mapGetters生成计算属性，从getters中读取数据。（数组写法）
     // ...mapGetters(["x"]),
 
-    ...mapState(["goods_info"]),
+    ...mapState(["cartCommodityList"]),
     ...mapGetters(["quantity", "amount"]),
   },
 
-  watch: {},
+  watch: {
+  },
 };
 </script>
 
@@ -265,12 +259,15 @@ export default {
     left: 50%;
     transform: translateX(-50%);
     width: 375rem;
+
     .app-header-left {
       display: flex;
       align-items: center;
+
       .app-header-item {
         width: 31.25rem;
         margin: 0 10.417rem;
+
         .app-header-icon {
           background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAYAAABV7bNHAAABfUlEQVR4AWL4//8/oH1zzA4gCMJgbNv239i2beP+R8gXczpmV79XB9ja3UEDDJCAIAQhCEF/TBAgCEEIUkSKFrEoahD0VFCdOLtmWxQh6E5Okzh7xCyC7n85T+lyL0jREJDT434NMr6cAde7mLHmXDDkfptX1AfkjPk+B9lyRn0fFO01Z8r9SVrRGJAzLaL9CrJ/q4XvlnPBX5IT4/qyqqgJyFkWcX5v8/aXsyKSXKc7FLUBORuGHAeC7K18y5DjQ5CiOiBnU6T6zSjav9WWSPebcrV3qz2R4Tcnba85hyLTb9Le/nL2RY7fqsbLcnJdl30MOSeiwG9dzD4hX1DitnCoSBDlhpwy15VVRY9YDvxWhd/xYAjiF2ORLnYviG3+45dTDopcNbisftvvRrrjlQmzNAeCSLmStP9OSZR9KBx+6cK95LH0TPMC7S80UNGCRxMnbcA0kg8iiFEEhlkYh2Kg7vd/STvPj2Qy1NvKUO+PgCAEIQhBCEIQghAE53kdVfEUUHFYAAAAAElFTkSuQmCC);
           width: 26.039rem;
@@ -285,10 +282,12 @@ export default {
         }
       }
     }
+
     .app-header-middle {
       flex: 1;
       font-size: 15.625rem;
       min-width: 0;
+
       .app-header-title {
         color: rgb(102, 102, 102);
         width: 100%;
@@ -298,12 +297,15 @@ export default {
         text-align: center;
       }
     }
+
     .app-header-right {
       display: flex;
       align-items: center;
+
       .app-header-item {
         width: 31.25rem;
         margin: 0 10.417rem;
+
         .app-header-icon {
           background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAQAAAD/5HvMAAAEx0lEQVQYGe3Bf0yUdRwH8I9GpBtZVpul0y1/ZD8sKzdXbupMh3Pq0jWtzbVs9YfL8scfLq02h1m52R3c832+z/d5HrjjAOH4KQhy4MQD4eS4gXiCePLjBIwU8VeCOAPy3dZf/mEpz56zW93rRRQVFRUVFfU/dGFM+UTHlOrXzq/yf9HwefeS0plpk4/F0b+je5x/UZXIPZV+URmRwMEhQfs940K+ry6hYTY9Wu0Tyze6yxVYwSGgQoUKFSpUCMiwwH6zPLVqZVcsPRrlSwvqVVghwMGhQYMOHTp0aNDAIcBhhQ53UcWLFH4127QrElQwqEi7keUu21W/vnl5+/y2dwKraj8p3pdZ7bzDIYNDQmqweQWFU/cTpU4GAQUMro6SbR2z6D4aFuRb0m4yqFCgDXq3U7hciynOSYQOBertgr2np9I/ODHPlSlDg4AN3m8oPKq+t0GHguSexg/ogepjPbvZkIACbci3lsx3Yr06rECGvSO4gB6SbxMb5pBhDwZeInN1vWJvY5DB+5uX0ShUfmeDAhtKCkOxZCZPogUCMo5vpFEJxRSkcKiQ0BBP5gnMSu+RIaGokEatc2ZqSEBCqasnhszi32SFgBYKLiQDqnfI0CAGz79B5uibkOOVIZCXTob0TrK3qeA4tpfM0TmPQYO427CBDHLrDAoO+H+LITM0r+VQkRy88DwZFFiXBAWOS73PkRl8WzgU5JVVjyeDQi+LPhmOW63zyAxH9yvgKE31jCGDKqZltTPYh+rXkBmKXAIyKpLIsJpn8hskpMDzJZmhKFuAoXIfGeaPO+i1IQXHtpIZPHsVyCgXZJhnUm6TBPtI3UdkBv9mDo5DOVUxZFDpjAO/yHDcCcSTGVreZxDI8F58kgxqelMe5LD3h+aQGbrnsBENYrDjbTKobnMSFLh8A7Fkhpa4Ao8MgcpdZEjTuAI3h4DnRzJLYEMiODKPX3qKDAjOF30a+N3gYjJLz+SMs0lQUL2ZDDiYqkDCQffFcWSeih8sYEht/HUqjVJgjehTIOH0CjJT99QDbRJsKCxtG0+j0PWqvUOGFYdzyGxnlyVf5ZCQ9xM9tJPP5jbaIMEZ7J5B5jv6FR/iUPsP778eRw+hc4ajhEGBs+NkPIXDmTFuRyI4FBSW9EyhB2h9N+O0AgEFR5MoXK49XilzMDBktBZ+Fnia/oZ/ev6elKscAioUOEPtCyl8POucfRwSZOTVunZWxg9MoHtcnuxek5mQE7JBhoAODQIStBttCyh8OubmHEke4LBAhXM4uykt35mWb8212bPSi7M6nX9wWCGQfL2M9U73JjBw2KBfbl1M4VPxmG9tdl76gA0WWCBBhQYNKiRY8TMYMnuzXdVL6S/H90hQwGHvObeEwiv4Vpn1UG1ea9ZV510dOhxIG8npOnykNKF5Lt2jZjeDCgXJl4PLKdx6xja+4Hm94D3Hh471rhXFi+qm0X3UfMsgwKDeOreUIoP3awYFEsTNs8soMnh3MnAw6FdallNkOLGLQUBBcl/LSooMtTtkqODQBlpWU2TwbZGhgEG5fWY1RQbfVhkcDKK/eTVFhtrtMjg49Butiygy+LfKEOAodlKkCHyq94vhUx9T5GiYXjn73FiKioqKior6z/oTCs8KMOW0P6QAAAAASUVORK5CYII=);
 
@@ -320,11 +322,14 @@ export default {
       }
     }
   }
+
   .app-view {
     background: #fff;
     color: #3c3c3c;
+
     .point-box {
       background: #fff;
+
       .point {
         font-size: 12rem;
         color: #000;
@@ -332,12 +337,14 @@ export default {
         text-align: left;
       }
     }
+
     .ui-line {
       height: 10.414rem;
       background: #f5f5f5;
       overflow: hidden;
       clear: both;
     }
+
     .page-wrap {
       .nologin {
         .box-flex {
@@ -351,12 +358,14 @@ export default {
           justify-content: space-between;
 
           position: relative;
+
           span {
             font-size: 16.6667rem;
             color: rgba(0, 0, 0, 0.87);
             display: block;
             text-align: left;
           }
+
           em {
             font-style: normal;
             font-size: 12.5rem;
@@ -377,22 +386,25 @@ export default {
           }
         }
       }
+
       .noitems {
         background: #ebebeb;
         padding: 10.417rem;
+
         .router-link-active {
           font-size: 12.5rem;
           text-decoration: none;
           text-align: center;
+
           span {
             display: inline-block;
             line-height: 41.664rem;
-            background: url(https://m.mi.com/static/img/cartnull.daaf7926f8.png)
-              no-repeat 0;
+            background: url(https://m.mi.com/static/img/cartnull.daaf7926f8.png) no-repeat 0;
             background-size: auto 100%;
             padding: 0 8.333rem 0 50rem;
             color: rgba(0, 0, 0, 0.27);
           }
+
           em {
             display: inline-block;
             border: 1px solid rgba(0, 0, 0, 0.15);
@@ -405,27 +417,31 @@ export default {
           }
         }
       }
+
       .cart-list {
         background: #fff;
+
         .item {
           .ui-flex {
             padding: 12.5rem 0;
             display: flex;
+
             .choose {
               width: 10.417rem;
               padding: 0 10.417rem;
               height: 93.75rem;
             }
+
             .unchecked {
-              background: url(https://s1.mi.com/m/images/m/check_normal.png) 50%
-                50% no-repeat;
+              background: url(https://s1.mi.com/m/images/m/check_normal.png) 50% 50% no-repeat;
               background-size: 20.834rem 20.834rem;
             }
+
             .checked {
-              background: url(//s1.mi.com/m/images/m/check_press.png) 50% 50%
-                no-repeat;
+              background: url(//s1.mi.com/m/images/m/check_press.png) 50% 50% no-repeat;
               background-size: 20.834rem 20.834rem;
             }
+
             .imgProduct {
               display: block;
               position: relative;
@@ -435,12 +451,14 @@ export default {
               border: 1px solid #eee;
               border-radius: 2px;
               overflow: hidden;
+
               img {
                 height: 100%;
                 width: 100%;
                 object-fit: cover;
               }
             }
+
             .info {
               width: 239.578rem;
               height: 91.75rem;
@@ -455,30 +473,37 @@ export default {
                 margin-bottom: 6.25rem;
                 margin-right: 15.625rem;
                 padding: 0;
+
                 .name {
                   width: 187.5rem;
                   white-space: "";
                 }
               }
+
               .align-start {
                 -webkit-box-align: start;
                 align-items: flex-start;
               }
+
               .ui-flex {
                 display: flex;
               }
+
               .price-without {
                 font-size: 12.5rem;
                 color: #ff5934;
                 margin-bottom: 6.25rem;
+
                 .mr-10 {
                   margin-right: 5.208rem;
                 }
               }
+
               .num {
                 .xm-input-number {
                   display: inline-block;
                   border: 1px solid #eee;
+
                   .input-sub {
                     display: inline-block;
                     width: 31.25rem;
@@ -487,6 +512,7 @@ export default {
                     vertical-align: middle;
                     background-color: #fafafa;
                     text-align: center;
+
                     .image-icons {
                       opacity: 0.3;
                       width: 31.25rem;
@@ -498,9 +524,11 @@ export default {
                       background-repeat: no-repeat;
                       background-position: 50%;
                     }
+
                     .icon-line {
                       background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAAT0lEQVR4Ae3TgQXAAAxE0azXDpLJKx3jmoOO0IR+fA7w4ELSioAAAQIECBAgn0My8+iq01BlQwwjXswWyG3I6TGIuGz47WuAAAECBAgQIA8XIA86877kLgAAAABJRU5ErkJggg==);
                     }
+
                     .icon-cross {
                       opacity: 1;
                       background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAAc0lEQVR4AWJIS0ujBBsD8W0oNga0YwcYAMMwGIV3ve3kW88x3R3GZAlDYJTgLx4eBfVBkFT+qkKaZ1+7EvIkyK2EWA4IECA/AQECZPW6Z6J6GBYlImNmgVwB2eIhRJxhYGqAABkMCBAgLOEtQY46ZIJDzQtkpFzgLwrvWQAAAABJRU5ErkJggg==);
@@ -517,10 +545,12 @@ export default {
                     font-size: 16.667rem;
                   }
                 }
+
                 .delete {
                   float: right;
                   margin-right: 10.417rem;
                   display: block;
+
                   .image-icons {
                     display: inline-block;
                     background-color: transparent;
@@ -528,6 +558,7 @@ export default {
                     background-position: 50%;
                     background-size: cover;
                   }
+
                   .icon-delete {
                     width: 31.25rem;
                     height: 31.25rem;
@@ -537,6 +568,7 @@ export default {
               }
             }
           }
+
           .append {
             .insurance {
               display: flex;
@@ -549,13 +581,16 @@ export default {
               background: #f6f6f6;
               font-size: 12.5rem;
               margin: 0 10.417rem 10.417rem;
+
               .i1 {
                 margin-right: 6.25rem;
+
                 img {
                   width: 26.039rem;
                   height: 26.039rem;
                 }
               }
+
               .i2 {
                 -webkit-box-flex: 1;
                 flex: 1;
@@ -564,6 +599,7 @@ export default {
                 justify-content: space-between;
                 align-items: center;
                 padding-right: 10.417rem;
+
                 span {
                   flex: 1;
                   text-overflow: ellipsis;
@@ -576,11 +612,13 @@ export default {
                   line-height: 26.039rem;
                   text-align: left;
                 }
+
                 em {
                   font-style: normal;
                   color: #ff5722;
                 }
               }
+
               .i3 {
                 display: flex;
                 align-content: center;
@@ -589,13 +627,16 @@ export default {
               }
             }
           }
+
           .batch {
             background: #fff;
+
             .batch-item {
               display: flex;
               -webkit-box-pack: justify;
               justify-content: space-between;
               padding: 6.25rem 0;
+
               .batch-img {
                 width: 52.078rem;
                 height: 52.078rem;
@@ -604,6 +645,7 @@ export default {
                 background-color: #f8f8f8;
                 overflow: hidden;
               }
+
               .batch-name {
                 flex: 1;
                 -webkit-flex: 1;
@@ -613,8 +655,10 @@ export default {
                 color: #000;
                 justify-content: space-between;
                 margin-right: 10.417rem;
+
                 p {
                   display: flex;
+
                   .gift-tag {
                     color: #f44a33;
                     border: 1px solid #f22a10;
@@ -622,6 +666,7 @@ export default {
                     padding: 0 2.604rem;
                     margin-right: 6.25rem;
                   }
+
                   .gift-name {
                     // max-width: 146.617rem;
                     overflow: hidden;
@@ -632,74 +677,29 @@ export default {
                   }
                 }
               }
+
               .align-center {
                 -webkit-box-align: center;
                 align-items: center;
               }
             }
           }
+
           .ui-line {
             height: 10.414rem;
             background: #f5f5f5;
             overflow: hidden;
             clear: both;
           }
+
           .justify-center {
             -webkit-box-pack: center;
             justify-content: center;
           }
         }
       }
-      .recommend-box {
-        background: #fff;
-        text-align: left;
-        .wrap {
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: space-between;
-          overflow: hidden;
-          .goods-item {
-            flex: 0 1 49.5%;
-            overflow: hidden;
-            .goods-img-box {
-              img {
-                display: block;
-                width: 100%;
-                min-height: 185.625rem;
-              }
-            }
-            .goods-info {
-              padding: 9.375rem 13.542rem 11.458rem;
-              .goods-name {
-                font-size: 14.5833rem;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-              }
-              .goods-price {
-                font-size: 16.6667rem;
-                display: inline-block;
-                color: #ff6700;
-                margin-top: 5.20833rem;
-                span {
-                  font-size: 12.5rem;
-                }
-                .price {
-                  font-size: 12.5rem;
-                  margin-left: 5.20833rem;
-                  color: rgba(0, 0, 0, 0.54);
-                  text-decoration: line-through;
-                  span {
-                    font-size: 12rem;
-                    text-decoration: none;
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
     }
+
     .bottom-submit {
       position: fixed;
       bottom: 0;
@@ -710,10 +710,12 @@ export default {
       box-shadow: 0 3px 14px 2px rgb(0 0 0 / 12%);
       margin: 0 auto;
       max-width: 375rem;
+
       .box-flex {
         display: flex;
         justify-content: space-between;
         align-items: center;
+
         .price-box {
           flex: 1;
           font-size: 13.54rem;
@@ -721,19 +723,23 @@ export default {
           text-align: left;
           padding-top: 7.813rem;
           padding-left: 15.625rem;
+
           .amount {
             display: flex;
             align-items: baseline;
+
             strong {
               font-size: 20.8333rem;
               color: #ff5722;
               margin-right: 4.167rem;
             }
+
             .info {
               color: #ff5900;
               margin-left: 5.208rem;
               display: flex;
               align-items: center;
+
               img {
                 width: 10.414rem;
                 height: 6.359rem;
@@ -743,8 +749,10 @@ export default {
             }
           }
         }
+
         .btn-box {
           display: flex;
+
           .btn {
             width: 105.156rem;
             background: #ff6700;
@@ -753,6 +761,7 @@ export default {
             line-height: 52.078rem;
             font-size: 14.833rem;
           }
+
           .disable {
             color: #333;
             background: #f4f4f4;
@@ -763,9 +772,11 @@ export default {
       }
     }
   }
+
   .app-view-with-header {
     padding-top: 50rem;
   }
+
   .app-view-with-footer {
     padding-bottom: 50rem;
   }

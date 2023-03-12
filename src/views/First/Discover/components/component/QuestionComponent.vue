@@ -3,7 +3,7 @@
   <div class="question-list" v-if="data">
     <div class="title">{{ data.question }}</div>
     <div class="author">
-      <img :src="data.avatar" alt="" class="icon" />
+      <img :src="data.avatar" alt="" class="icon" @click="jumpPersonalView(`/micircle/personal/${data.mid}`)" />
       <div class="tips">
         <div class="name">{{ data.nickname }}</div>
         <div class="time">提问于{{ data.create_time }}</div>
@@ -17,6 +17,12 @@
 <script>
 export default {
   props: ["data"],
+  methods: {
+    jumpPersonalView(routing) {
+      // console.log('触发', routing);
+      this.$router.push(routing)
+    }
+  },
 };
 </script>
 
@@ -27,10 +33,12 @@ export default {
   padding: 13.542rem 16.667rem 16.667rem;
   margin-top: 50px;
   text-align: left;
+
   .title {
     font-size: 16.6667rem;
     line-height: 25rem;
   }
+
   .author {
     margin-top: 16.667rem;
 
@@ -40,22 +48,26 @@ export default {
 
     -webkit-box-align: center;
     align-items: center;
+
     .icon {
       width: 25rem;
       height: 25rem;
       border-radius: 25rem;
       margin-right: 10.417rem;
     }
+
     .tips {
       .name {
         font-size: 12.5rem;
       }
+
       .time {
         font-size: 12rem;
         color: rgba(0, 0, 0, 0.3);
         padding-top: 2.604rem;
       }
     }
+
     .follow-btn {
       width: 66.664rem;
       height: 25rem;
@@ -70,5 +82,6 @@ export default {
     }
   }
 }
+
 // 问题结束
 </style>

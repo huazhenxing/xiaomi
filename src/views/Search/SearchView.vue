@@ -8,13 +8,7 @@
           <i class="image-icons"></i>
         </div>
         <!-- 搜索框 -->
-        <van-search
-          v-model="value"
-          show-action
-          placeholder="搜索商品名称"
-          left-icon=""
-          @search="onSearch(value)"
-        >
+        <van-search v-model="value" show-action placeholder="搜索商品名称" left-icon="" @search="onSearch(value)">
           <!-- 搜索按钮 -->
           <template #action>
             <div class="header-btn-right" @click="onSearch(value)">
@@ -25,11 +19,7 @@
       </div>
       <!-- 搜索列表 -->
       <ul class="search-key-list" v-if="isShow">
-        <li
-          v-for="(item, index) in list"
-          :key="index"
-          @click="commodityList(item.title, '/search/list')"
-        >
+        <li v-for="(item, index) in list" :key="index" @click="commodityList(item.title, '/search/list')">
           <div class="item">
             <span class="txt">{{ item.title }}</span>
           </div>
@@ -39,28 +29,19 @@
 
     <div class="content">
       <!-- 搜索历史 -->
-      <div
-        class="history"
-        style="margin-bottom: 31.25rem"
-        v-if="historicalRecord.length > 0"
-      >
+      <div class="history" style="margin-bottom: 31.25rem" v-if="historicalRecord.length > 0">
         <div class="title">
           <span>搜索历史</span>
           <i @click="Dialog">
             <img
               src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACsAAAArCAYAAADhXXHAAAADgUlEQVRYR+3Z28vmUxQH8M/MMA6JGIfEpEmOMykXoygkh2JqmpLzTLlQuGBC0cwfQAqFCy7mQjlOQtTQDBKKIik5S3LKMRrCOM3oO+1Hr6fn9z6//Zv3974unlW/notn77W+e+21117ru+epl3k4CMeVb48KFb/jvfJ9hx0Vc8VwrZyMm3Ea5tdOxna8hPV4tWZ+LdiD8QjOqDHSMPYFXIxv2+qqBXsqHsLh+Akv4oe2xnAATse++AKX4uW282vBnoIHcQQexVX4sa0x7I97cQE+xWV4pe38WrB7YwWW4im8WXlIYu9ErMQ72IRf+wIbvTGYLwelq+RgJhN0ygbZ1htwQlfrPc57C7cnbAZhcAXuxp49Gu2qehuuwYYB2HNwHw7tqrHHeV/hcmyZesCORL7/m3yMfJ1usDlbTFPqWoz98PYcIFuGrfh82PYosCeVWyohsRZ3zSLga3Fn2fbcbq9NtT0K7CV4oBQpz+C8WQT7NM4tOXw1Hh4HNoPuL4Oew9mzCPZZnFXsrSlO+9f8KM9OwLbcnd49uwS/4esxgBZhn3LKm+qKXsFeVLLFZ6VcfKMB8LHYjL9xPZ5sKGJ6BbsRFxYQqW03NIBNkXRb+S+p6Ub8MWJsr2CfwKpi9OpSWI/Cu670bfnvHlyHNI/DMgE78MjEs31dChPP9uXZtqkruTV9VGTOUlf6/hhP7XnlcEk3JS+l/c7C9ipp6/GG7rjX1LVbYVdyM/08TXueginFfH4z7q+Gy6NXsC3rk9bDJmBbu6pyYLVnc2jSKSS+ni+dQhXNUwlwMDz2AvbMUpGlUwgJOG2ncH5pJ8LOhI5MT/RLRwA101LrpgcLrRoWJh3LY+PAZmVZ0SGFTg89GcavbwkzGRo19P83hQ7Nzk7r2bTg6SqXlzIuCT2c6q6whuMWGlYx9fAdyBvF60iXvZOJmRonw4p2x62FM4iS94uisNx9SdjwOCQdRZySi+Ym/DkObP4/qhyuMDORD0vRHI9ni2ZKEmrxYAr3o4vS3IYJxY+GjTTRRwOGOgcsbHckqwwln/jNe8CuhEV2LO8SidNQ99nNSFjwHLCRjPo4mj6U/C04Hgtmyp0j9OS6fhdpf0Ldj5RxYAMwbHiegJLCjsHCGQSdpvEDhKbKk1VY7gDvBHYwKSf0QByG8AR5D+vyYDfQlxDK+9cn+BLfNzSQ/wH9D912ATugfSf4AAAAAElFTkSuQmCC"
-              alt=""
-            />
+              alt="" />
           </i>
         </div>
         <div class="buttons_out scroll">
           <div class="buttons_in">
-            <span
-              v-for="(item, index) in historicalRecord"
-              :key="index"
-              @click="commodityList(item.texts, '/search/list')"
-              >{{ item.texts }}</span
-            >
+            <span v-for="(item, index) in historicalRecord" :key="index"
+              @click="commodityList(item.texts, '/search/list')">{{ item.texts }}</span>
           </div>
         </div>
       </div>
@@ -84,9 +65,10 @@
 
 <script>
 import Vue from "vue";
-import { Search, Dialog } from "vant";
+import { Search, Dialog, Toast } from "vant";
 Vue.use(Search);
 Vue.use(Dialog);
+Vue.use(Toast);
 
 export default {
   name: "SearchView",
@@ -103,12 +85,21 @@ export default {
   },
 
   created() {
+    Toast.loading({
+      message: '加载中...',
+      forbidClick: true,
+    });
     this.axios({
       method: "get",
       url: "hisearch/se_default",
     }).then((res) => {
+      // 数据回来之后 取消加载
+      Toast.clear();
       this.discover_list = res ? res.data.data.discover_list : [];
     });
+
+    this.historicalRecord =
+      JSON.parse(window.localStorage.getItem("historicalRecord")) || [];//历史记录
   },
 
   watch: {
@@ -119,7 +110,11 @@ export default {
       }
       this.timer = setTimeout(() => {
         if (this.value !== "") {
-          this.isShow = true;
+
+          Toast.loading({
+            message: '加载中...',
+            forbidClick: true,
+          });
           this.axios({
             method: "get",
             url: "hisearch/suggestion_v3",
@@ -127,7 +122,10 @@ export default {
               query: this.value,
             },
           }).then((res) => {
+            // 数据回来之后 取消加载
+            Toast.clear();
             this.list = res.data.data.list;
+            this.isShow = true;
           });
         }
       }, 500);
@@ -172,7 +170,20 @@ export default {
     },
 
     commodityList(str, url) {
+      console.log(str);
       this.value = str;
+
+      let texts = this.value;
+      //过滤重复
+      this.historicalRecord = this.historicalRecord.filter(
+        (m) => m.texts !== texts
+      );
+      //本地存储
+      this.historicalRecord.unshift({
+        id: Date.now(),
+        texts: texts,
+      });
+
       this.isShow = true;
       this.$router.push({ path: url, query: { key: str } });
     },
@@ -189,6 +200,7 @@ export default {
 .app-search-page {
   background: #fff;
   color: #3c3c3c;
+
   .app-search-head {
     display: flex;
     align-items: center;
@@ -198,16 +210,19 @@ export default {
     left: 0;
     right: 0;
     background: #f2f2f2;
+
     .app-search {
       display: flex;
       align-items: center;
       justify-content: space-between;
       height: 41.667rem;
       width: 100%;
+
       .header-btn-left {
         display: block;
         margin: 0 8rem;
         color: #666;
+
         .image-icons {
           width: 26.039rem;
           height: 26.039rem;
@@ -220,6 +235,7 @@ export default {
           background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAYAAABV7bNHAAABfUlEQVR4AWL4//8/oH1zzA4gCMJgbNv239i2beP+R8gXczpmV79XB9ja3UEDDJCAIAQhCEF/TBAgCEEIUkSKFrEoahD0VFCdOLtmWxQh6E5Okzh7xCyC7n85T+lyL0jREJDT434NMr6cAde7mLHmXDDkfptX1AfkjPk+B9lyRn0fFO01Z8r9SVrRGJAzLaL9CrJ/q4XvlnPBX5IT4/qyqqgJyFkWcX5v8/aXsyKSXKc7FLUBORuGHAeC7K18y5DjQ5CiOiBnU6T6zSjav9WWSPebcrV3qz2R4Tcnba85hyLTb9Le/nL2RY7fqsbLcnJdl30MOSeiwG9dzD4hX1DitnCoSBDlhpwy15VVRY9YDvxWhd/xYAjiF2ORLnYviG3+45dTDopcNbisftvvRrrjlQmzNAeCSLmStP9OSZR9KBx+6cK95LH0TPMC7S80UNGCRxMnbcA0kg8iiFEEhlkYh2Kg7vd/STvPj2Qy1NvKUO+PgCAEIQhBCEIQghAE53kdVfEUUHFYAAAAAElFTkSuQmCC);
         }
       }
+
       .search-item {
         background: #fff;
         flex: 1;
@@ -235,9 +251,11 @@ export default {
           line-height: normal;
         }
       }
+
       .header-btn-right {
         display: block;
         color: #666;
+
         .image-icons {
           display: block;
           width: 31.25rem;
@@ -251,6 +269,7 @@ export default {
       }
     }
   }
+
   .search-key-list {
     text-align: left;
     position: fixed;
@@ -259,14 +278,17 @@ export default {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
+
     li {
       background: #fff;
       list-style: none;
+
       .item {
         border-bottom: 1px solid rgba(0, 0, 0, 0.15);
         margin: 0 16.667rem;
         display: flex;
         height: 48.477rem;
+
         .txt {
           display: inline-block;
           width: 100%;
@@ -280,9 +302,11 @@ export default {
       }
     }
   }
+
   .content {
     padding: 20.833rem 16.667rem;
     text-align: left;
+
     .history {
       .title {
         display: flex;
@@ -290,21 +314,26 @@ export default {
         justify-content: space-between;
         font-size: 14.5833rem;
         font-weight: 700;
+
         i {
           display: inline-block;
+
           img {
             width: 14.578rem;
             height: 14.578rem;
           }
         }
       }
+
       .scroll {
         max-height: 42.5rem;
       }
+
       .buttons_out {
         margin-top: 4.167rem;
         margin-right: -12.5rem;
         overflow: hidden;
+
         .buttons_in {
           span {
             vertical-align: bottom;
@@ -323,11 +352,13 @@ export default {
         }
       }
     }
+
     .tabs {
       font-size: 14.5833rem;
       line-height: 14.5833rem;
       font-weight: 700;
       margin-bottom: 16.667rem;
+
       .tab {
         vertical-align: text-top;
         display: inline-block;
@@ -336,14 +367,17 @@ export default {
         border: none;
       }
     }
+
     .discovery {
       padding-left: 12.5rem;
+
       div {
         display: inline-flex;
         align-items: center;
         width: 50%;
         margin-bottom: 18.229rem;
         font-size: 12.5rem;
+
         span {
           display: inline-block;
           // max-width: 150rem;
@@ -353,11 +387,13 @@ export default {
       }
     }
   }
+
   ::v-deep .van-search--show-action {
     flex: 1;
     padding: 0;
     background: 0;
   }
+
   ::v-deep .van-search__content {
     background-color: #fff;
     border: 1px solid #e5e5e5;
@@ -366,6 +402,7 @@ export default {
     align-items: center;
   }
 }
+
 .app-view {
   padding-top: 41.667rem;
 }

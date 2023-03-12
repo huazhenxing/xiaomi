@@ -85,11 +85,7 @@
                   </div>
 
                   <ul class="selecte-container">
-                    <li
-                      class="selecte-item"
-                      v-for="(item, index) in data.vote_option_list"
-                      :key="index"
-                    >
+                    <li class="selecte-item" v-for="(item, index) in data.vote_option_list" :key="index">
                       {{ item.description }}
                     </li>
                   </ul>
@@ -98,11 +94,7 @@
             </div>
           </div>
           <!-- 评论 -->
-          <CommentsComponent
-            :data="data"
-            :comment_list="comment_list"
-            class="main-content"
-          />
+          <CommentsComponent :data="data" :comment_list="comment_list" class="main-content" />
           <!-- 底部 -->
           <!-- <div class="bottom-action">
             <div class="bottom-action-left">
@@ -177,11 +169,7 @@
                 <div class="share-user-info-wrap">
                   <div class="shear-content-user-info">
                     <div class="share-user-icon">
-                      <img
-                        class="user-icon"
-                        :src="moment_list.author_img"
-                        alt=""
-                      />
+                      <img class="user-icon" :src="moment_list.author_img" alt="" />
                     </div>
                     <div class="right">
                       <span class="share-user-name">{{
@@ -206,19 +194,12 @@
                 <div class="mi-video-wrapper">
                   <div class="mi-overlayer-play vertical-flex">
                     <button class="mi-video-play-btn">
-                      <img
-                        src="https://m.mi.com/static/img/play.5f8eee7206.png"
-                        alt=""
-                        class="mi-icon mi-icon-play-lg"
-                      />
+                      <img src="https://m.mi.com/static/img/play.5f8eee7206.png" alt=""
+                        class="mi-icon mi-icon-play-lg" />
                     </button>
                   </div>
                   <div class="mi-video-box">
-                    <video
-                      :src="moment_list.clip_advanced_url"
-                      autoplay
-                      loop
-                    ></video>
+                    <video :src="moment_list.clip_advanced_url" autoplay loop></video>
                   </div>
                 </div>
               </div>
@@ -227,11 +208,7 @@
               <div class="article-info">
                 <div class="read-num"></div>
                 <div class="praise">
-                  <img
-                    src="https://m.mi.com/static/img/pre-praise.db3cd290e8.png"
-                    alt=""
-                    class="praise-icon"
-                  />
+                  <img src="https://m.mi.com/static/img/pre-praise.db3cd290e8.png" alt="" class="praise-icon" />
                   <span class="praise-num">{{ moment_list.praise_num }}</span>
                 </div>
               </div>
@@ -239,11 +216,7 @@
               <!-- 评论 -->
               <div class="comments-container">
                 <div class="comments-title">评论</div>
-                <div
-                  class="comment-block"
-                  v-for="item in comment_list"
-                  :key="item.id"
-                >
+                <div class="comment-block" v-for="item in comment_list" :key="item.id">
                   <div class="user-icon">
                     <img class="user-icon" :src="item.img" alt="" />
                   </div>
@@ -256,11 +229,7 @@
                     </div>
                     <div class="comment-text">{{ item.comment }}</div>
                     <div class="praise">
-                      <img
-                        class="praise-icon"
-                        src="https://m.mi.com/static/img/pre-praise.db3cd290e8.png"
-                        alt=""
-                      />
+                      <img class="praise-icon" src="https://m.mi.com/static/img/pre-praise.db3cd290e8.png" alt="" />
                       <span class="praise-num" v-if="item.praise_num > 0">{{
                         item.praise_num
                       }}</span>
@@ -335,6 +304,11 @@ import QuestionComponent from "@/views/First/Discover/components/component/Quest
 import AnswerComponent from "@/views/First/Discover/components/component/AnswerComponent.vue"; //回答
 import ArticleComponent from "@/views/First/Discover/components/component/ArticleComponent.vue"; //赞美
 
+import Vue from 'vue';
+import { Toast } from 'vant';
+
+Vue.use(Toast);
+
 export default {
   components: {
     HeaderComponent,
@@ -367,12 +341,13 @@ export default {
   mounted() {
     // 路由参数
     this.content_type = this.$route.params.content_type;
-    console.log(this.content_type);
-    console.log(this.$route.params.id);
-    console.log(this.$route.query.vote_id);
 
     // 发送请求
     if (this.content_type == 2 || this.content_type == 3) {
+      Toast.loading({
+        message: '加载中...',
+        forbidClick: true,
+      });
       // 文章详情（2/3）
       this.axios({
         method: "get",
@@ -381,7 +356,9 @@ export default {
           id: this.$route.params.id,
         },
       }).then((res) => {
-        console.log("文章详情（2/3）==>", res);
+        // 数据回来之后 取消加载
+        Toast.clear();
+        // console.log("文章详情（2/3）==>", res);
         this.data = res.data.data;
       });
       // 文章详情（2/3）评论列表
@@ -396,7 +373,9 @@ export default {
           is_summary: false,
         },
       }).then((res) => {
-        console.log("文章详情（2/3）评论列表==>", res);
+        // 数据回来之后 取消加载
+        Toast.clear();
+        // console.log("文章详情（2/3）评论列表==>", res);
         this.comment_list = res.data.data.comment_list;
         this.total = res.data.data;
       });
@@ -409,7 +388,9 @@ export default {
           content_id: this.$route.params.id,
         },
       }).then((res) => {
-        console.log("内容详情（1）==>", res);
+        // 数据回来之后 取消加载
+        Toast.clear();
+        // console.log("内容详情（1）==>", res);
         this.data = res.data.data;
         this.entity_circle = res.data.data.entity_circle;
       });
@@ -425,7 +406,9 @@ export default {
           is_summary: false,
         },
       }).then((res) => {
-        console.log("内容详情（1）评论列表==>", res);
+        // 数据回来之后 取消加载
+        Toast.clear();
+        // console.log("内容详情（1）评论列表==>", res);
         this.total = res.data.data;
         this.comment_list = res.data.data.comment_list;
       });
@@ -438,7 +421,9 @@ export default {
           vote_id: this.$route.query.vote_id,
         },
       }).then((res) => {
-        console.log("投票详情（5）==>", res);
+        // 数据回来之后 取消加载
+        Toast.clear();
+        // console.log("投票详情（5）==>", res);
         this.data = res.data.data;
       });
       // 投票详情（5）评论列表
@@ -454,7 +439,9 @@ export default {
           is_vote: true,
         },
       }).then((res) => {
-        console.log("投票详情（5）评论列表==>", res);
+        // 数据回来之后 取消加载
+        Toast.clear();
+        // console.log("投票详情（5）评论列表==>", res);
         this.comment_list = res.data.data.comment_list;
       });
     } else if (this.content_type == 6) {
@@ -467,7 +454,9 @@ export default {
           product_id: this.$route.params.id,
         },
       }).then((res) => {
-        console.log("问题详情（6）==>", res);
+        // 数据回来之后 取消加载
+        Toast.clear();
+        // console.log("问题详情（6）==>", res);
         this.data = res.data.data;
       });
 
@@ -484,7 +473,9 @@ export default {
           is_hot: false,
         },
       }).then((res) => {
-        console.log("问题详情（6）评论列表==>", res);
+        // 数据回来之后 取消加载
+        Toast.clear();
+        // console.log("问题详情（6）评论列表==>", res);
       });
 
       // 问题详情（6）评论回复列表
@@ -500,7 +491,8 @@ export default {
           is_hot: true,
         },
       }).then((res) => {
-        console.log("问题详情（6）评论回复列表==>", res);
+        // 数据回来之后 取消加载
+        Toast.clear();
         this.answer_list = res.data.data.answer_list;
       });
     } else if (this.content_type == 99) {
@@ -512,7 +504,8 @@ export default {
           moment_id_list: this.$route.params.id,
         },
       }).then((res) => {
-        console.log("视频测评详情（99）==>", res);
+        // 数据回来之后 取消加载
+        Toast.clear();
         this.moment_list = res.data.data.moment_list
           ? res.data.data.moment_list[0]
           : [];
@@ -528,7 +521,8 @@ export default {
           page_index: 1,
         },
       }).then((res) => {
-        console.log("视频测评详情（99）评论列表==>", res);
+        // 数据回来之后 取消加载
+        Toast.clear();
         this.comment_list = res.data.data.comment_list;
       });
     } else if (this.content_type == 100) {
@@ -540,7 +534,8 @@ export default {
           comment_id: this.$route.params.id,
         },
       }).then((res) => {
-        console.log("买家秀详情（100）==>", res);
+        // 数据回来之后 取消加载
+        Toast.clear();
         this.data = res.data.data;
         this.entity_circle = res.data.data.entity_circle;
       });
@@ -555,7 +550,8 @@ export default {
           page_index: 1,
         },
       }).then((res) => {
-        console.log("买家秀详情（100）评论列表==>", res);
+        // 数据回来之后 取消加载
+        Toast.clear();
         this.comment_list = res.data.data.comment_list;
       });
     }
@@ -575,14 +571,17 @@ export default {
     margin-bottom: 50rem;
   }
 }
+
 // 视图容器结束
 
 // 主要内容开始
 .main-content {
   margin: 0 12.5rem;
   overflow: hidden;
+
   .article {
     text-align: left;
+
     .card {
       margin-bottom: 20.833rem;
       margin-left: 0;
@@ -594,6 +593,7 @@ export default {
     }
   }
 }
+
 // 主要内容结束
 
 // 内容开始
@@ -608,20 +608,24 @@ export default {
   width: 100%;
   line-height: 29.166rem;
 }
+
 // 内容结束
 
 // 顶部开始
 .top-block {
   margin-bottom: -52.083rem;
+
   img {
     width: 100%;
   }
 }
+
 // 顶部结束
 
 // 投票开始
 .vote-block {
   margin-bottom: 24.635rem;
+
   .vote-wrap {
     position: relative;
     width: 350rem;
@@ -631,9 +635,11 @@ export default {
     text-align: left;
     white-space: normal;
     word-break: break-all;
+
     .vote-inner {
       text-align: left;
       padding: 24.323rem 16.667rem;
+
       .vote-title {
         font-size: 16.6667rem;
         font-family: MI-LANTING--GBK1-Bold, MI-LANTING--GBK1;
@@ -642,6 +648,7 @@ export default {
         line-height: 22.547rem;
         margin-bottom: 6.25rem;
       }
+
       .vote-desc {
         font-size: 14.5833rem;
         font-family: MI-LANTING_GB-OUTSIDE-YS, MI-LANTING_GB-OUTSIDE;
@@ -652,6 +659,7 @@ export default {
         overflow: hidden;
         text-overflow: ellipsis;
       }
+
       .vote-body {
         .vote-status {
           margin-bottom: 15.625rem;
@@ -662,6 +670,7 @@ export default {
           flex-wrap: nowrap;
           height: 13.906rem;
           line-height: 13.906rem;
+
           .left-status {
             display: flex;
             justify-content: left;
@@ -669,6 +678,7 @@ export default {
             flex-wrap: nowrap;
             height: 13.906rem;
             line-height: 13.906rem;
+
             .vote-progress {
               background: #ff754b;
               border-radius: 2rem;
@@ -679,6 +689,7 @@ export default {
               color: #fff;
               margin-right: 6.25rem;
             }
+
             .vote-partice {
               font-size: 12rem;
               font-family: MI-LANTING_GB-OUTSIDE-YS, MI-LANTING_GB-OUTSIDE;
@@ -709,20 +720,24 @@ export default {
     }
   }
 }
+
 // 投票结束
 
 // 评论开始
 .comments {
   margin-bottom: 10.417rem;
   text-align: left;
+
   .comments-num {
     margin-bottom: 14.583rem;
     color: #333;
     font-size: 12.5rem;
   }
+
   .comments-user {
     margin-bottom: 20.833rem;
     display: flex;
+
     .comments-user-avatar {
       margin-right: 12.5rem;
       width: 27.078rem;
@@ -730,6 +745,7 @@ export default {
       border-radius: 50%;
       overflow: hidden;
     }
+
     .comments-user-input {
       flex: 1;
       padding: 0 12.5rem;
@@ -741,12 +757,14 @@ export default {
       color: #999;
     }
   }
+
   .comments-list {
     .comment {
       display: flex;
       align-items: flex-start;
       text-align: left;
       padding-bottom: 10.417rem;
+
       .comment-avatar {
         margin-right: 12.5rem;
         width: 27.078rem;
@@ -754,23 +772,29 @@ export default {
         border-radius: 50%;
         overflow: hidden;
       }
+
       .comment-content {
         padding-bottom: 7.292rem;
         border-bottom: 1px solid #f5f5f5;
 
         flex: 1;
+
         .comment-info {
           display: flex;
           align-items: flex-start;
+
           .comment-info-l {
             flex: 1;
+
             .comment-user {
               font-size: 12.5rem;
               color: #999;
+
               .time {
                 margin-left: 5.208rem;
               }
             }
+
             .comment-text {
               margin-top: 3.125rem;
               font-size: 13.5417rem;
@@ -783,6 +807,7 @@ export default {
               -webkit-line-clamp: 2;
             }
           }
+
           .comment-praise {
             display: flex;
             align-items: flex-end;
@@ -790,11 +815,13 @@ export default {
             font-size: 12rem;
             font-weight: 500;
             position: relative;
+
             .num {
               margin-right: 2.083rem;
               position: relative;
               top: -10%;
             }
+
             .i-praise {
               display: inline-block;
               width: 15.102rem;
@@ -802,6 +829,7 @@ export default {
             }
           }
         }
+
         .comment-discuss {
           margin-top: 2.604rem;
           margin-bottom: 3.125rem;
@@ -810,28 +838,32 @@ export default {
           border-radius: 5rem;
           //   line-height: 94.558rem;
           font-size: 13.5417rem;
+
           .comment-discuss-item {
             margin-bottom: 6.25rem;
             width: 281.25rem;
+
             .name {
               color: #999;
             }
+
             .text {
               color: #333;
             }
           }
+
           .comment-discuss-more {
             display: flex;
             align-items: center;
             color: #999;
+
             &::after {
               margin-right: 3.125rem;
               content: "";
               display: inline-block;
               width: 12.5rem;
               height: 12.5rem;
-              background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEEAAABBCAMAAAC5KTl3AAACSVBMVEUAAAAAAAD///+AgIBVVVWqqqpAQECAgIBmZmZVVVWAgIBtbW2SkpJgYGBxcXFmZmZdXV10dHRqampiYmJtbW1mZmZ3d3dpaWljY2NxcXFra2tmZmZhYWFtbW1oaGhvb29qampmZmZsbGxoaGhkZGRtbW1qampjY2NkZGRsbGxmZmZqampnZ2dra2tpaWlqampnZ2dlZWVmZmZkZGRnZ2dmZmZpaWlnZ2dqampmZmZpaWlnZ2dqamppaWloaGhmZmZqampnZ2dmZmZnZ2dqampmZmZlZWVoaGhnZ2dnZ2dmZmZqamplZWVnZ2dnZ2dqamplZWVmZmZpaWlnZ2doaGhoaGhmZmZpaWloaGhoaGhnZ2doaGhoaGhmZmZmZmZmZmZoaGhnZ2dnZ2dmZmZmZmZoaGhmZmZoaGhoaGhmZmZoaGhmZmZoaGhnZ2dmZmZmZmZoaGhnZ2dnZ2dmZmZmZmZnZ2dnZ2dmZmZmZmZnZ2dnZ2dnZ2dnZ2dnZ2dmZmZnZ2dmZmZlZWVnZ2dlZWVmZmZnZ2dmZmZnZ2dnZ2dmZmZnZ2dnZ2dmZmZnZ2dmZmZnZ2dnZ2dmZmZmZmZnZ2dmZmZnZ2dmZmZmZmZmZmZnZ2dmZmZmZmZmZmZnZ2dnZ2dmZmZnZ2dnZ2dmZmZmZmZnZ2dmZmZmZmZmZmZmZmZmZmZnZ2dmZmZmZmZmZmZnZ2dmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZlZWVmZmZmZmZmZmZnZ2dmZmZmZmZlZWVmZmZmZmYtetiGAAAAwnRSTlMAAQECAwMEBAUGBgcHCAkKCwsMDQ4PDxESEhMUFRUWFxgZGhscHB0fISEjJCUmJykqKy0uLzIzNDU3ODk6PUBBQUVGSEhLTExNT1BSU1RXV1haWl5gYmRkZWdoaWxucHFxcnR1dnZ4eHt9fYCAgYKEhIaIjI6PkpOUlZeZnJ+goaKmqautrrGztLa3uLm6u7y/wcPExcfKzM3Oz9LT09XW2Nrb3N3e3+Dk5efo6uvs7e7v8PLz9Pb3+Pn5+vv7/P3+/nALAZAAAAISSURBVBgZ7cH5X8txHAfw9+f7ndmhRsYymtDmpi1ErFy5c4fkKvctyhGRc+7IUYam5liMUVu+tvqu7+svs0c8PHoou/rR9/kkmUwmkyWGcYz+hWcUB+1IDUf9U6VrKSamsW1aOp36ZZxbah/DUwzKsTtcjpIhPPXBFHmnfOftqRxFpRq3/1H7J0exhfrQz6p0BZsv5Y2iqDIW3vkKeBzrJ9Jf9PNOOEWITQdtFJW1zBUGIFxfq2TUG5+9z9cJSJ/rllNU+pzKlwDCnqsrM6mXoZOON/zoBnz3VlsoutTFZ993AHhXuyyT/kjN2f1UALr8d3eaVBQDV1DrkQAI1Ys4+o2ZS1oFAIHmLQaeYjLl17gBhN0X7UbqoTWVP+4IA/4n22aqGcXEdEWXPwoAXFX56RShnra5zi8hLNQfsqRQXJSFD7wApO8VuRRh2NDiBxD07jHzFB8ua8WNVgDi6zO2EYOHb7/d3gkIjeWzdYzixOuLb34LAaLz8HzrqltfAEl8cXpGGsWPG7ausQ1AqO3o3uc+AGLgWLaCEjFoysb7PqA79MrpCwJiU4VdzyghKuOuhwERv0hvLswxUKL4jK1vA+ghdVUtUDFKmMZaWu9HhOSuXjKaURJSJhx5FgwDH64UmCgpTDG5zCsANYVqjpKkyz3Q0HJtzXhGSUubevJckZkGgCmzzFqeBkSrJZlMJvu//QQhFMDXuz9zFAAAAABJRU5ErkJggg==)
-                50% no-repeat;
+              background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEEAAABBCAMAAAC5KTl3AAACSVBMVEUAAAAAAAD///+AgIBVVVWqqqpAQECAgIBmZmZVVVWAgIBtbW2SkpJgYGBxcXFmZmZdXV10dHRqampiYmJtbW1mZmZ3d3dpaWljY2NxcXFra2tmZmZhYWFtbW1oaGhvb29qampmZmZsbGxoaGhkZGRtbW1qampjY2NkZGRsbGxmZmZqampnZ2dra2tpaWlqampnZ2dlZWVmZmZkZGRnZ2dmZmZpaWlnZ2dqampmZmZpaWlnZ2dqamppaWloaGhmZmZqampnZ2dmZmZnZ2dqampmZmZlZWVoaGhnZ2dnZ2dmZmZqamplZWVnZ2dnZ2dqamplZWVmZmZpaWlnZ2doaGhoaGhmZmZpaWloaGhoaGhnZ2doaGhoaGhmZmZmZmZmZmZoaGhnZ2dnZ2dmZmZmZmZoaGhmZmZoaGhoaGhmZmZoaGhmZmZoaGhnZ2dmZmZmZmZoaGhnZ2dnZ2dmZmZmZmZnZ2dnZ2dmZmZmZmZnZ2dnZ2dnZ2dnZ2dnZ2dmZmZnZ2dmZmZlZWVnZ2dlZWVmZmZnZ2dmZmZnZ2dnZ2dmZmZnZ2dnZ2dmZmZnZ2dmZmZnZ2dnZ2dmZmZmZmZnZ2dmZmZnZ2dmZmZmZmZmZmZnZ2dmZmZmZmZmZmZnZ2dnZ2dmZmZnZ2dnZ2dmZmZmZmZnZ2dmZmZmZmZmZmZmZmZmZmZnZ2dmZmZmZmZmZmZnZ2dmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZlZWVmZmZmZmZmZmZnZ2dmZmZmZmZlZWVmZmZmZmYtetiGAAAAwnRSTlMAAQECAwMEBAUGBgcHCAkKCwsMDQ4PDxESEhMUFRUWFxgZGhscHB0fISEjJCUmJykqKy0uLzIzNDU3ODk6PUBBQUVGSEhLTExNT1BSU1RXV1haWl5gYmRkZWdoaWxucHFxcnR1dnZ4eHt9fYCAgYKEhIaIjI6PkpOUlZeZnJ+goaKmqautrrGztLa3uLm6u7y/wcPExcfKzM3Oz9LT09XW2Nrb3N3e3+Dk5efo6uvs7e7v8PLz9Pb3+Pn5+vv7/P3+/nALAZAAAAISSURBVBgZ7cH5X8txHAfw9+f7ndmhRsYymtDmpi1ErFy5c4fkKvctyhGRc+7IUYam5liMUVu+tvqu7+svs0c8PHoou/rR9/kkmUwmkyWGcYz+hWcUB+1IDUf9U6VrKSamsW1aOp36ZZxbah/DUwzKsTtcjpIhPPXBFHmnfOftqRxFpRq3/1H7J0exhfrQz6p0BZsv5Y2iqDIW3vkKeBzrJ9Jf9PNOOEWITQdtFJW1zBUGIFxfq2TUG5+9z9cJSJ/rllNU+pzKlwDCnqsrM6mXoZOON/zoBnz3VlsoutTFZ993AHhXuyyT/kjN2f1UALr8d3eaVBQDV1DrkQAI1Ys4+o2ZS1oFAIHmLQaeYjLl17gBhN0X7UbqoTWVP+4IA/4n22aqGcXEdEWXPwoAXFX56RShnra5zi8hLNQfsqRQXJSFD7wApO8VuRRh2NDiBxD07jHzFB8ua8WNVgDi6zO2EYOHb7/d3gkIjeWzdYzixOuLb34LAaLz8HzrqltfAEl8cXpGGsWPG7ausQ1AqO3o3uc+AGLgWLaCEjFoysb7PqA79MrpCwJiU4VdzyghKuOuhwERv0hvLswxUKL4jK1vA+ghdVUtUDFKmMZaWu9HhOSuXjKaURJSJhx5FgwDH64UmCgpTDG5zCsANYVqjpKkyz3Q0HJtzXhGSUubevJckZkGgCmzzFqeBkSrJZlMJvu//QQhFMDXuz9zFAAAAABJRU5ErkJggg==) 50% no-repeat;
               background-size: 100% 100%;
               text-decoration: inherit;
               vertical-align: inherit;
@@ -842,19 +874,20 @@ export default {
       }
     }
   }
+
   .comments-more {
     margin: 15.625rem 0;
     color: #999;
     font-size: 12.5rem;
     text-align: center;
+
     &::after {
       margin-right: 3.125rem;
       content: "";
       display: inline-block;
       width: 12.5rem;
       height: 12.5rem;
-      background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEEAAABBCAMAAAC5KTl3AAACSVBMVEUAAAAAAAD///+AgIBVVVWqqqpAQECAgIBmZmZVVVWAgIBtbW2SkpJgYGBxcXFmZmZdXV10dHRqampiYmJtbW1mZmZ3d3dpaWljY2NxcXFra2tmZmZhYWFtbW1oaGhvb29qampmZmZsbGxoaGhkZGRtbW1qampjY2NkZGRsbGxmZmZqampnZ2dra2tpaWlqampnZ2dlZWVmZmZkZGRnZ2dmZmZpaWlnZ2dqampmZmZpaWlnZ2dqamppaWloaGhmZmZqampnZ2dmZmZnZ2dqampmZmZlZWVoaGhnZ2dnZ2dmZmZqamplZWVnZ2dnZ2dqamplZWVmZmZpaWlnZ2doaGhoaGhmZmZpaWloaGhoaGhnZ2doaGhoaGhmZmZmZmZmZmZoaGhnZ2dnZ2dmZmZmZmZoaGhmZmZoaGhoaGhmZmZoaGhmZmZoaGhnZ2dmZmZmZmZoaGhnZ2dnZ2dmZmZmZmZnZ2dnZ2dmZmZmZmZnZ2dnZ2dnZ2dnZ2dnZ2dmZmZnZ2dmZmZlZWVnZ2dlZWVmZmZnZ2dmZmZnZ2dnZ2dmZmZnZ2dnZ2dmZmZnZ2dmZmZnZ2dnZ2dmZmZmZmZnZ2dmZmZnZ2dmZmZmZmZmZmZnZ2dmZmZmZmZmZmZnZ2dnZ2dmZmZnZ2dnZ2dmZmZmZmZnZ2dmZmZmZmZmZmZmZmZmZmZnZ2dmZmZmZmZmZmZnZ2dmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZlZWVmZmZmZmZmZmZnZ2dmZmZmZmZlZWVmZmZmZmYtetiGAAAAwnRSTlMAAQECAwMEBAUGBgcHCAkKCwsMDQ4PDxESEhMUFRUWFxgZGhscHB0fISEjJCUmJykqKy0uLzIzNDU3ODk6PUBBQUVGSEhLTExNT1BSU1RXV1haWl5gYmRkZWdoaWxucHFxcnR1dnZ4eHt9fYCAgYKEhIaIjI6PkpOUlZeZnJ+goaKmqautrrGztLa3uLm6u7y/wcPExcfKzM3Oz9LT09XW2Nrb3N3e3+Dk5efo6uvs7e7v8PLz9Pb3+Pn5+vv7/P3+/nALAZAAAAISSURBVBgZ7cH5X8txHAfw9+f7ndmhRsYymtDmpi1ErFy5c4fkKvctyhGRc+7IUYam5liMUVu+tvqu7+svs0c8PHoou/rR9/kkmUwmkyWGcYz+hWcUB+1IDUf9U6VrKSamsW1aOp36ZZxbah/DUwzKsTtcjpIhPPXBFHmnfOftqRxFpRq3/1H7J0exhfrQz6p0BZsv5Y2iqDIW3vkKeBzrJ9Jf9PNOOEWITQdtFJW1zBUGIFxfq2TUG5+9z9cJSJ/rllNU+pzKlwDCnqsrM6mXoZOON/zoBnz3VlsoutTFZ993AHhXuyyT/kjN2f1UALr8d3eaVBQDV1DrkQAI1Ys4+o2ZS1oFAIHmLQaeYjLl17gBhN0X7UbqoTWVP+4IA/4n22aqGcXEdEWXPwoAXFX56RShnra5zi8hLNQfsqRQXJSFD7wApO8VuRRh2NDiBxD07jHzFB8ua8WNVgDi6zO2EYOHb7/d3gkIjeWzdYzixOuLb34LAaLz8HzrqltfAEl8cXpGGsWPG7ausQ1AqO3o3uc+AGLgWLaCEjFoysb7PqA79MrpCwJiU4VdzyghKuOuhwERv0hvLswxUKL4jK1vA+ghdVUtUDFKmMZaWu9HhOSuXjKaURJSJhx5FgwDH64UmCgpTDG5zCsANYVqjpKkyz3Q0HJtzXhGSUubevJckZkGgCmzzFqeBkSrJZlMJvu//QQhFMDXuz9zFAAAAABJRU5ErkJggg==)
-        50% no-repeat;
+      background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEEAAABBCAMAAAC5KTl3AAACSVBMVEUAAAAAAAD///+AgIBVVVWqqqpAQECAgIBmZmZVVVWAgIBtbW2SkpJgYGBxcXFmZmZdXV10dHRqampiYmJtbW1mZmZ3d3dpaWljY2NxcXFra2tmZmZhYWFtbW1oaGhvb29qampmZmZsbGxoaGhkZGRtbW1qampjY2NkZGRsbGxmZmZqampnZ2dra2tpaWlqampnZ2dlZWVmZmZkZGRnZ2dmZmZpaWlnZ2dqampmZmZpaWlnZ2dqamppaWloaGhmZmZqampnZ2dmZmZnZ2dqampmZmZlZWVoaGhnZ2dnZ2dmZmZqamplZWVnZ2dnZ2dqamplZWVmZmZpaWlnZ2doaGhoaGhmZmZpaWloaGhoaGhnZ2doaGhoaGhmZmZmZmZmZmZoaGhnZ2dnZ2dmZmZmZmZoaGhmZmZoaGhoaGhmZmZoaGhmZmZoaGhnZ2dmZmZmZmZoaGhnZ2dnZ2dmZmZmZmZnZ2dnZ2dmZmZmZmZnZ2dnZ2dnZ2dnZ2dnZ2dmZmZnZ2dmZmZlZWVnZ2dlZWVmZmZnZ2dmZmZnZ2dnZ2dmZmZnZ2dnZ2dmZmZnZ2dmZmZnZ2dnZ2dmZmZmZmZnZ2dmZmZnZ2dmZmZmZmZmZmZnZ2dmZmZmZmZmZmZnZ2dnZ2dmZmZnZ2dnZ2dmZmZmZmZnZ2dmZmZmZmZmZmZmZmZmZmZnZ2dmZmZmZmZmZmZnZ2dmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZlZWVmZmZmZmZmZmZnZ2dmZmZmZmZlZWVmZmZmZmYtetiGAAAAwnRSTlMAAQECAwMEBAUGBgcHCAkKCwsMDQ4PDxESEhMUFRUWFxgZGhscHB0fISEjJCUmJykqKy0uLzIzNDU3ODk6PUBBQUVGSEhLTExNT1BSU1RXV1haWl5gYmRkZWdoaWxucHFxcnR1dnZ4eHt9fYCAgYKEhIaIjI6PkpOUlZeZnJ+goaKmqautrrGztLa3uLm6u7y/wcPExcfKzM3Oz9LT09XW2Nrb3N3e3+Dk5efo6uvs7e7v8PLz9Pb3+Pn5+vv7/P3+/nALAZAAAAISSURBVBgZ7cH5X8txHAfw9+f7ndmhRsYymtDmpi1ErFy5c4fkKvctyhGRc+7IUYam5liMUVu+tvqu7+svs0c8PHoou/rR9/kkmUwmkyWGcYz+hWcUB+1IDUf9U6VrKSamsW1aOp36ZZxbah/DUwzKsTtcjpIhPPXBFHmnfOftqRxFpRq3/1H7J0exhfrQz6p0BZsv5Y2iqDIW3vkKeBzrJ9Jf9PNOOEWITQdtFJW1zBUGIFxfq2TUG5+9z9cJSJ/rllNU+pzKlwDCnqsrM6mXoZOON/zoBnz3VlsoutTFZ993AHhXuyyT/kjN2f1UALr8d3eaVBQDV1DrkQAI1Ys4+o2ZS1oFAIHmLQaeYjLl17gBhN0X7UbqoTWVP+4IA/4n22aqGcXEdEWXPwoAXFX56RShnra5zi8hLNQfsqRQXJSFD7wApO8VuRRh2NDiBxD07jHzFB8ua8WNVgDi6zO2EYOHb7/d3gkIjeWzdYzixOuLb34LAaLz8HzrqltfAEl8cXpGGsWPG7ausQ1AqO3o3uc+AGLgWLaCEjFoysb7PqA79MrpCwJiU4VdzyghKuOuhwERv0hvLswxUKL4jK1vA+ghdVUtUDFKmMZaWu9HhOSuXjKaURJSJhx5FgwDH64UmCgpTDG5zCsANYVqjpKkyz3Q0HJtzXhGSUubevJckZkGgCmzzFqeBkSrJZlMJvu//QQhFMDXuz9zFAAAAABJRU5ErkJggg==) 50% no-repeat;
       background-size: 100% 100%;
       transform: translateY(20%);
       text-decoration: inherit;
@@ -863,14 +896,17 @@ export default {
     }
   }
 }
+
 .comments-block {
   padding: 12.5rem;
   background-color: #fff;
 }
+
 // 评论结束
 
 // 视频详情开始
 .app-shell {
+
   // 视图容器开始
   .app-view-wrapper {
     .article-container {
@@ -879,10 +915,12 @@ export default {
       margin: auto;
       box-sizing: border-box;
       margin-bottom: 50rem;
+
       // 主要内容开始
       .main-content {
         margin: 0 12.5rem;
         overflow: hidden;
+
         // 用户开始
         .log-block {
           .share-user-info-wrap {
@@ -893,11 +931,13 @@ export default {
             display: flex;
             justify-content: space-between;
             align-items: center;
+
             .shear-content-user-info {
               display: flex;
               justify-content: flex-start;
               overflow: hidden;
               text-overflow: ellipsis;
+
               .share-user-icon {
                 margin-right: 9.375rem;
                 vertical-align: middle;
@@ -906,6 +946,7 @@ export default {
                 height: 38.172rem;
 
                 position: relative;
+
                 .user-icon {
                   width: 100%;
                   height: 100%;
@@ -913,10 +954,12 @@ export default {
                   animation: opacity01 0.3s;
                 }
               }
+
               .right {
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
+
                 .share-user-name {
                   display: inline-block;
                   font-size: 14.5833rem;
@@ -925,6 +968,7 @@ export default {
                 }
               }
             }
+
             .follow-author {
               .focus-button-container {
                 .go-to-focuse {
@@ -943,6 +987,7 @@ export default {
             }
           }
         }
+
         // 用户结束
 
         // 内容开始
@@ -957,6 +1002,7 @@ export default {
           width: 100%;
           line-height: 29.166rem;
         }
+
         // 内容结束
 
         // 视频开始
@@ -965,11 +1011,13 @@ export default {
           border-radius: 5rem;
           overflow: hidden;
         }
+
         .mi-video-player {
           position: relative;
           width: 100%;
           background: #000;
           z-index: 0;
+
           .mi-video-wrapper {
             position: relative;
             width: 100%;
@@ -978,6 +1026,7 @@ export default {
             user-select: none;
             -webkit-font-smoothing: antialiased;
             -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+
             button {
               position: relative;
               cursor: pointer;
@@ -986,6 +1035,7 @@ export default {
               color: #fff;
               font-size: 0.2rem;
             }
+
             .mi-overlayer-play {
               position: absolute;
               width: 100%;
@@ -993,6 +1043,7 @@ export default {
               top: 0;
               left: 0;
               z-index: 4;
+
               .mi-video-play-btn {
                 width: 68px;
                 height: 68px;
@@ -1000,6 +1051,7 @@ export default {
                 background: rgba(0, 0, 0, 0.8);
                 padding: 10px;
                 border-radius: 200px;
+
                 .mi-icon-play-lg {
                   width: 100%;
                   height: 100%;
@@ -1007,6 +1059,7 @@ export default {
                 }
               }
             }
+
             .vertical-flex {
               display: flex;
               align-items: center;
@@ -1016,11 +1069,13 @@ export default {
               -webkit-box-orient: vertical;
               flex-direction: column;
             }
+
             .mi-video-box {
               height: 196.875rem;
             }
           }
         }
+
         // 视频结束
 
         // 赞美开始
@@ -1036,15 +1091,18 @@ export default {
           line-height: 16.664rem;
           font-size: 12.5rem;
           color: rgba(0, 0, 0, 0.54);
+
           .praise {
             display: flex;
             align-content: center;
+
             .praise-icon {
               height: 12.5rem;
               width: 12.5rem;
               vertical-align: baseline;
               margin-right: 4.167rem;
             }
+
             .praise-num {
               line-height: 15rem;
               font-size: 12.5rem;
@@ -1052,6 +1110,7 @@ export default {
             }
           }
         }
+
         // 赞美结束
 
         // 评论开始
@@ -1060,6 +1119,7 @@ export default {
           width: 100%;
           border-top: 0.5px solid rgba(0, 0, 0, 0.15);
           padding: 16.667rem 0;
+
           .comments-title {
             text-align: left;
             width: 100%;
@@ -1070,12 +1130,14 @@ export default {
             line-height: 25rem;
             margin-bottom: 16.667rem;
           }
+
           .comment-block {
             margin-bottom: 25rem;
             position: relative;
             width: 100%;
             text-align: left;
             min-height: 87.203rem;
+
             .user-icon {
               position: absolute;
               top: 0;
@@ -1083,29 +1145,34 @@ export default {
               width: 38.172rem;
               height: 38.172rem;
               border-radius: 38.172rem;
+
               .user-icon {
                 width: 100%;
                 height: 100%;
                 border-radius: 50%;
               }
             }
+
             .comment-info {
               position: relative;
               margin-left: 47.224rem;
               padding: 0 0 16.667rem 3.474rem;
               border-bottom: 0.5px solid rgba(0, 0, 0, 0.15);
+
               .user-info {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 margin-bottom: 12.5rem;
                 position: relative;
+
                 .nickname {
                   font-size: 14.5833rem;
                   color: rgba(0, 0, 0, 0.54);
                   line-height: 19.789rem;
                   margin-bottom: 2.083rem;
                 }
+
                 .date {
                   font-size: 12rem;
                   color: rgba(0, 0, 0, 0.54);
@@ -1119,12 +1186,14 @@ export default {
 
                 display: flex;
                 align-items: center;
+
                 .praise-icon {
                   height: 12.5rem;
                   width: 12.5rem;
                   vertical-align: baseline;
                   margin-right: 4.167rem;
                 }
+
                 .praise-num {
                   line-height: 15rem;
                   font-size: 12.5rem;
@@ -1134,6 +1203,7 @@ export default {
             }
           }
         }
+
         // 评论结束
 
         // 底部区域开始
@@ -1145,6 +1215,7 @@ export default {
           bottom: 50rem;
           left: 0;
           background-color: #fff;
+
           .bottom-area-content {
             width: 375rem;
             height: 100%;
@@ -1152,6 +1223,7 @@ export default {
             display: flex;
             justify-content: center;
             align-items: center;
+
             .write-comment-enter {
               display: flex;
               flex-direction: column;
@@ -1160,15 +1232,18 @@ export default {
               text-align: center;
               flex: 1;
               margin-left: 22.552rem;
+
               .write-comment-icon {
                 width: 25rem;
                 height: 25rem;
               }
+
               .write-comment-text {
                 font-size: 12rem;
                 color: rgba(0, 0, 0, 0.72);
               }
             }
+
             .shop-button {
               width: 282.289rem;
               border-radius: 20.53rem;
@@ -1186,12 +1261,16 @@ export default {
             }
           }
         }
+
         // 底部区域结束
       }
+
       // 主要内容结束
     }
   }
+
   // 视图容器开始
 }
+
 // 视频详情结束
 </style>

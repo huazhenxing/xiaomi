@@ -9,13 +9,8 @@
       </div>
       <div class="header-center">
         <div class="tab">
-          <div
-            class="tab-item"
-            v-for="(item, idx) in arrList"
-            :key="idx"
-            :class="idx == index ? 'active' : ''"
-            @click="son(idx)"
-          >
+          <div class="tab-item" v-for="(item, idx) in arrList" :key="idx" :class="idx == index ? 'active' : ''"
+            @click="son(idx)">
             {{ item }}
           </div>
         </div>
@@ -25,25 +20,8 @@
 
     <!-- 列表 -->
     <div class="content-list">
-      <van-list
-        v-model="loading"
-        :finished="finished"
-        finished-text="没有更多了"
-        @load="onLoad"
-        v-if="rec_list.length"
-      >
-        <div
-          v-for="(item, index) in rec_list"
-          :key="index"
-          @click="
-            ClickJump(
-              `discover/article/${item.content.id}/${item.content.content_type}`,
-              item.content.content_type,
-              item.content.announce_id,
-              item.content.vote_detail ? item.content.vote_detail.vote_id : ''
-            )
-          "
-        >
+      <van-list v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad" v-if="rec_list.length">
+        <div v-for="(item, index) in rec_list" :key="index">
           <!-- 问题板块 -->
           <QuestionList v-if="item.content.question" :content="item.content" />
 
@@ -51,10 +29,7 @@
           <VoteList v-if="item.content.vote_detail" :content="item.content" />
 
           <!-- 内容板块(文章、内容、买家秀、视频) -->
-          <ContentList
-            v-if="!item.content.question && !item.content.vote_detail"
-            :content="item.content"
-          />
+          <ContentList v-if="!item.content.question && !item.content.vote_detail" :content="item.content" />
         </div>
       </van-list>
     </div>
@@ -158,6 +133,7 @@ export default {
     },
 
     ClickJump(url, type, announce_id, vote_id) {
+      console.log('跳转');
       if (type == 6) {
         this.$router.push({ path: url, query: { announce_id } });
       } else if (type == 5) {
@@ -193,10 +169,12 @@ export default {
     right: -0.24rem;
     border-bottom: 1px solid #f8f8f8;
   }
+
   .header-left {
     width: 40.625rem;
     height: 40.625rem;
     position: relative;
+
     .avatar {
       width: 27.078rem;
       height: 27.078rem;
@@ -207,6 +185,7 @@ export default {
       top: 50%;
       left: 0;
       transform: translateY(-50%);
+
       img {
         display: block;
         width: 100%;
@@ -214,10 +193,12 @@ export default {
       }
     }
   }
+
   .header-center {
     flex: 1;
     overflow-x: hidden;
     position: relative;
+
     &::before {
       content: "";
       position: absolute;
@@ -234,6 +215,7 @@ export default {
 
       box-sizing: inherit;
     }
+
     &::after {
       content: "";
       position: absolute;
@@ -250,6 +232,7 @@ export default {
 
       box-sizing: inherit;
     }
+
     .tab {
       display: flex;
       width: 100%;
@@ -265,9 +248,11 @@ export default {
         white-space: nowrap;
         flex-shrink: 0;
       }
+
       .active {
         color: #333;
         position: relative;
+
         &::after {
           display: block;
           content: "";
@@ -284,18 +269,20 @@ export default {
       }
     }
   }
+
   .header-right {
     width: 40.625rem;
     height: 40.625rem;
-    background: url(https://m.mi.com/static/img/small_bell.88e26cc7bc.png) 50%
-      no-repeat;
+    background: url(https://m.mi.com/static/img/small_bell.88e26cc7bc.png) 50% no-repeat;
     background-size: 100% 100%;
     position: relative;
   }
 }
+
 .content-list {
   padding: 40.625rem 0;
 }
+
 // .content-list {
 //   .poster {
 //     margin: 20.833rem 12.5rem 0rem;

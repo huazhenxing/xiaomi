@@ -24,17 +24,11 @@ const routes = [
         path: "discover",
         component: () => import("@/views/First/Discover/Find.vue"),
         children: [
-          //列表
+          //米圈列表
           {
             path: "",
             name: "DiscoverView",
             component: () => import("@/views/First/Discover/DiscoverView.vue"),
-          },
-          //详情
-          {
-            path: "article/:id/:content_type",
-            name: "DetailView",
-            component: () => import("@/views/First/Discover/DetailView.vue"),
           },
         ],
       },
@@ -57,7 +51,27 @@ const routes = [
         component: () =>
           import("@/views/First/Commodity/CommodityListView.vue"),
       },
+
+      //我的订单
+      {
+        path: "order/list",
+        name: "OrderListView",
+        component: () => import("@/views/First/OrderList/OrderListView.vue"),
+        meta: { isNeedLogin: true },
+      },
     ],
+  },
+  //米圈详情
+  {
+    path: "/discover/article/:id/:content_type",
+    name: "DetailView",
+    component: () => import("@/views/First/Discover/DetailView.vue"),
+  },
+  //米圈用户
+  {
+    path: "/micircle/personal/:mid",
+    name: "PersonalView",
+    component: () => import("@/views/Personal/PersonalView"),
   },
   //搜索
   {
@@ -84,10 +98,64 @@ const routes = [
     name: "CommodityView",
     component: () => import("@/views/Commodity/CommodityView"),
   },
+
+  //用户结算
+  {
+    path: "/order/checkout",
+    name: "CheckoutView",
+    component: () => import("@/views/Checkout/CheckoutView"),
+    meta: { isNeedLogin: true },
+  },
+
+  //地址编辑
+  {
+    path: "/address/edit",
+    name: "AddressEditView",
+    component: () => import("@/views/AddressEdit/AddressEditView"),
+  },
+
+  //收货地址列表
+  {
+    path: "/address/list",
+    name: "AddressListView",
+    component: () => import("@/views/AddressList/AddressListView"),
+  },
+
+  //订单/付款
+  {
+    path: "/order/pay",
+    name: "OrderPayView",
+    component: () => import("@/views/OrderPay/OrderPayView"),
+  },
+
+  //登录
+  {
+    path: "/fe/service/login/phone",
+    name: "LoginView",
+    component: () => import("@/views/Login/LoginView"),
+  },
+  //个人中心
+  {
+    path: "/user/set",
+    name: "UserSetView",
+    component: () => import("@/views/UserSet/UserSetView"),
+    meta: { isNeedLogin: true },
+  },
 ];
 
 const router = new VueRouter({
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  // 检查用户是否已登录
+  if (to.meta.isNeedLogin && !localStorage.getItem("token")) {
+    // 将用户重定向到登录页面
+    router.push("/fe/service/login/phone");
+  } else {
+    // 用户已登录
+    next();
+  }
 });
 
 export default router;
